@@ -9,7 +9,7 @@ class GoogleCalendarManager: ObservableObject {
     @Published var lastSyncDate: Date?
     
     private let calendarService = GTLRCalendarService()
-    private let clientID = "YOUR_CLIENT_ID.apps.googleusercontent.com" // Replace with your client ID
+    private let clientID = "688632885106-p0mle40kksuii21vgtt184cd65g1q6au.apps.googleusercontent.com"
     
     private init() {
         checkAuthStatus()
