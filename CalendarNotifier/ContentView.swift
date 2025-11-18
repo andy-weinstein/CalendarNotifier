@@ -36,6 +36,22 @@ struct ContentView: View {
 
             Spacer()
 
+            // Sync Status
+            if syncManager.isSyncing {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Syncing...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.bottom, 8)
+            } else if let count = syncManager.lastSyncCount {
+                Text("\(count) event\(count == 1 ? "" : "s") synced")
+                    .font(.caption)
+                    .foregroundColor(.green)
+                    .padding(.bottom, 8)
+            }
+
             // Action Buttons
             VStack(spacing: 12) {
                 Button {
@@ -50,6 +66,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(syncManager.isSyncing)
 
                 Button {
                     showingEventList = true

@@ -1,11 +1,14 @@
 import Foundation
 import Combine
 import WidgetKit
+import UIKit
 
 class CalendarSyncManager: ObservableObject {
     static let shared = CalendarSyncManager()
 
     @Published var events: [CalendarEvent] = []
+    @Published var lastSyncCount: Int?
+    @Published var isSyncing = false
 
     private let userDefaults = UserDefaults.standard
     private let sharedDefaults = UserDefaults(suiteName: "group.com.calendarnotifier.shared")
@@ -25,11 +28,19 @@ class CalendarSyncManager: ObservableObject {
     }
 
     func syncCalendar() async {
+        await MainActor.run {
+            isSyncing = true
+        }
+
         await withCheckedContinuation { continuation in
             GoogleCalendarManager.shared.fetchEvents { [weak self] events in
                 self?.processEvents(events)
                 continuation.resume()
             }
+        }
+
+        await MainActor.run {
+            isSyncing = false
         }
     }
     
@@ -60,6 +71,16 @@ class CalendarSyncManager: ObservableObject {
         // Update published events on main thread
         DispatchQueue.main.async {
             self.events = newEvents
+            self.lastSyncCount = newEvents.count
+
+            // Haptic feedback on successful sync
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+
+            // Clear the count after 3 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                self.lastSyncCount = nil
+            }
         }
 
         print("Synced \(newEvents.count) events")
