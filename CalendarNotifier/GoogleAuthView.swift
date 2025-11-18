@@ -9,26 +9,29 @@ struct GoogleAuthView: View {
         NavigationView {
             VStack(spacing: 20) {
                 Image(systemName: "person.badge.key.fill")
-                    .font(.system(size: 60))
+                    .font(.largeTitle)
+                    .imageScale(.large)
                     .foregroundColor(.blue)
-                
+                    .accessibilityHidden(true)
+
                 Text("Sign in with Google")
                     .font(.title2)
                     .bold()
-                
+
                 Text("Grant access to your Google Calendar to receive notifications")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
-                
+
                 if let error = errorMessage {
                     Text(error)
                         .font(.caption)
                         .foregroundColor(.red)
                         .padding()
+                        .accessibilityLabel("Error: \(error)")
                 }
-                
+
                 Button {
                     authenticateWithGoogle()
                 } label: {
@@ -38,6 +41,7 @@ struct GoogleAuthView: View {
                                 .tint(.white)
                         } else {
                             Image(systemName: "g.circle.fill")
+                                .accessibilityHidden(true)
                             Text("Sign in with Google")
                         }
                     }
@@ -46,6 +50,7 @@ struct GoogleAuthView: View {
                 .buttonStyle(.borderedProminent)
                 .disabled(isAuthenticating)
                 .padding(.horizontal)
+                .accessibilityHint("Authenticates with your Google account")
             }
             .navigationTitle("Authentication")
             .navigationBarTitleDisplayMode(.inline)

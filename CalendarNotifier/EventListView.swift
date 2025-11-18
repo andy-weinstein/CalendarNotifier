@@ -52,8 +52,9 @@ struct EventListView: View {
     private var emptyState: some View {
         VStack(spacing: 16) {
             Image(systemName: "calendar")
-                .font(.system(size: 50))
+                .font(.largeTitle)
                 .foregroundColor(.secondary)
+                .accessibilityHidden(true)
 
             Text("No Events")
                 .font(.title2)
@@ -63,6 +64,7 @@ struct EventListView: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
+        .accessibilityElement(children: .combine)
     }
 
     private var eventList: some View {
@@ -104,6 +106,7 @@ struct EventRow: View {
                 if showDate {
                     Text("•")
                         .foregroundColor(.secondary)
+                        .accessibilityHidden(true)
                     Text(event.startDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -120,10 +123,12 @@ struct EventRow: View {
                 HStack(spacing: 4) {
                     Image(systemName: "mappin")
                         .font(.caption2)
+                        .accessibilityHidden(true)
                     Text(location)
                         .font(.caption)
                 }
                 .foregroundColor(.secondary)
+                .accessibilityLabel("Location: \(location)")
             }
 
             // Description preview
@@ -141,5 +146,6 @@ struct EventRow: View {
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
     }
 }

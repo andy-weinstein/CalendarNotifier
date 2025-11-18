@@ -116,16 +116,20 @@ struct ContentView: View {
                 VStack(spacing: 8) {
                     // Day of week
                     Text(event.startDate.formatted(.dateTime.weekday(.wide)))
-                        .font(.system(size: 28, weight: .light))
+                        .font(.title2.weight(.light))
+                        .minimumScaleFactor(0.7)
 
                     // Date
                     Text(event.startDate.formatted(.dateTime.month(.wide).day()))
-                        .font(.system(size: 34, weight: .bold))
+                        .font(.title.weight(.bold))
+                        .minimumScaleFactor(0.7)
 
                     // Time
                     Text(event.startDate.formatted(.dateTime.hour().minute()))
-                        .font(.system(size: 48, weight: .bold))
+                        .font(.largeTitle.weight(.bold))
                         .foregroundColor(.blue)
+                        .minimumScaleFactor(0.7)
+                        .accessibilityLabel("Event time: \(event.startDate.formatted(.dateTime.hour().minute()))")
                 }
 
                 // Event details
@@ -150,8 +154,9 @@ struct ContentView: View {
             } else {
                 VStack(spacing: 12) {
                     Image(systemName: "calendar")
-                        .font(.system(size: 50))
+                        .font(.largeTitle)
                         .foregroundColor(.secondary)
+                        .accessibilityHidden(true)
 
                     Text("No Upcoming Events")
                         .font(.title2)
@@ -163,6 +168,7 @@ struct ContentView: View {
                         .multilineTextAlignment(.center)
                 }
                 .padding(.top, 40)
+                .accessibilityElement(children: .combine)
             }
         }
         .padding(.horizontal)
@@ -173,8 +179,10 @@ struct ContentView: View {
     private var unauthenticatedView: some View {
         VStack(spacing: 15) {
             Image(systemName: "calendar.badge.clock")
-                .font(.system(size: 60))
+                .font(.largeTitle)
+                .imageScale(.large)
                 .foregroundColor(.blue)
+                .accessibilityHidden(true)
 
             Text("Calendar Notifier")
                 .font(.title)
@@ -191,6 +199,7 @@ struct ContentView: View {
             }
             .buttonStyle(.borderedProminent)
             .padding(.top)
+            .accessibilityHint("Opens Google sign-in")
         }
         .padding()
         .navigationTitle("Calendar Notifier")
