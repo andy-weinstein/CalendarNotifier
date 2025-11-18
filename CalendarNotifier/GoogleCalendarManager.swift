@@ -1,6 +1,7 @@
 import Foundation
 import GoogleSignIn
-import GoogleAPIClientForREST
+import GoogleAPIClientForRESTCore
+import GoogleAPIClientForREST_Calendar
 
 class GoogleCalendarManager: ObservableObject {
     static let shared = GoogleCalendarManager()
