@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import WidgetKit
 
 class CalendarSyncManager: ObservableObject {
     static let shared = CalendarSyncManager()
@@ -7,6 +8,7 @@ class CalendarSyncManager: ObservableObject {
     @Published var events: [CalendarEvent] = []
 
     private let userDefaults = UserDefaults.standard
+    private let sharedDefaults = UserDefaults(suiteName: "group.com.calendarnotifier.shared")
     private let syncedEventsKey = "syncedEvents"
 
     private init() {
@@ -73,7 +75,14 @@ class CalendarSyncManager: ObservableObject {
     
     private func saveSyncedEvents(_ events: [CalendarEvent]) {
         if let data = try? JSONEncoder().encode(events) {
+            // Save to standard UserDefaults
             userDefaults.set(data, forKey: syncedEventsKey)
+
+            // Save to shared App Group for widget access
+            sharedDefaults?.set(data, forKey: syncedEventsKey)
+
+            // Tell widget to refresh
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 }
