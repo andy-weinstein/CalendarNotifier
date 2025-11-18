@@ -89,7 +89,8 @@ class GoogleCalendarManager: ObservableObject {
                     id: event.identifier ?? UUID().uuidString,
                     title: title,
                     startDate: start,
-                    location: event.location
+                    location: event.location,
+                    eventDescription: event.descriptionProperty
                 )
             }
             
@@ -107,4 +108,5 @@ struct CalendarEvent: Identifiable, Codable {
     let title: String
     let startDate: Date
     let location: String?
+    let eventDescription: String?
 }

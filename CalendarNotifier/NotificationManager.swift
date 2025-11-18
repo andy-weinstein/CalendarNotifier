@@ -32,10 +32,25 @@ class NotificationManager {
     ) {
         let content = UNMutableNotificationContent()
         content.title = event.title
-        content.body = "Starting in \(minutesBefore) minutes"
-        if let location = event.location {
-            content.subtitle = location
+
+        // Build subtitle with time and location
+        var subtitleParts: [String] = ["Starting in \(minutesBefore) minutes"]
+        if let location = event.location, !location.isEmpty {
+            subtitleParts.append(location)
         }
+        content.subtitle = subtitleParts.joined(separator: " • ")
+
+        // Body shows the event description if available
+        if let description = event.eventDescription, !description.isEmpty {
+            // Strip HTML tags that might be in the description
+            let cleanDescription = description
+                .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if !cleanDescription.isEmpty {
+                content.body = cleanDescription
+            }
+        }
+
         content.sound = sound      
         // Calculate trigger date
         guard let triggerDate = Calendar.current.date(byAdding: .minute, value: -minutesBefore, to: event.startDate) else {
