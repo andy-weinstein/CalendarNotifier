@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Calendar Notifier</string>
+    <string name="sync_now">Sync Now</string>
+    <string name="show_my_day">Show My Day</string>
+    <string name="settings">Settings</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="no_upcoming_events">No Upcoming Events</string>
+    <string name="tap_sync_to_refresh">Tap Sync Now to refresh your calendar</string>
+    <string name="next_event">NEXT EVENT</string>
+    <string name="syncing">Syncing...</string>
+    <string name="events_synced">%d event(s) synced</string>
+    <string name="today">Today</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="no_events">No Events</string>
+    <string name="calendar_clear">Your calendar is clear</string>
+    <string name="first_reminder">First Reminder</string>
+    <string name="second_reminder">Second Reminder</string>
+    <string name="reminder_sounds">Reminder Sounds</string>
+    <string name="test_notifications">Test Notifications</string>
+    <string name="test_first_reminder">Test First Reminder</string>
+    <string name="test_second_reminder">Test Second Reminder</string>
+    <string name="account">Account</string>
+    <string name="grant_calendar_access">Grant access to your Google Calendar to receive notifications</string>
+    <string name="authentication_failed">Authentication failed. Please try again.</string>
+    <string name="notification_channel_name">Calendar Reminders</string>
+    <string name="notification_channel_description">Notifications for upcoming calendar events</string>
+</resources>
