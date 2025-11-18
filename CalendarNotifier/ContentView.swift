@@ -85,6 +85,12 @@ struct ContentView: View {
             .padding(.vertical, 20)
         }
         .navigationTitle("Calendar Notifier")
+        .onAppear {
+            // Auto-sync when app launches
+            Task {
+                await syncManager.syncCalendar()
+            }
+        }
     }
 
     // MARK: - Next Event Section
