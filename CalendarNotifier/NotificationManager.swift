@@ -93,4 +93,40 @@ class NotificationManager {
             "\(eventID)-15min"
         ])
     }
+
+    func sendTestNotification(for reminderType: String) {
+        let settings = SoundSettingsManager.shared
+        let sound: UNNotificationSound
+        let title: String
+        let body: String
+
+        if reminderType == "1hour" {
+            sound = soundForId(settings.oneHourSound)
+            title = "Test: 1-Hour Reminder"
+            body = "This is how your 1-hour reminder will sound"
+        } else {
+            sound = soundForId(settings.fifteenMinSound)
+            title = "Test: 15-Minute Reminder"
+            body = "This is how your 15-minute reminder will sound"
+        }
+
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = sound
+
+        // Trigger in 1 second
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "test-\(reminderType)-\(Date().timeIntervalSince1970)",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error sending test notification: \(error)")
+            }
+        }
+    }
 }

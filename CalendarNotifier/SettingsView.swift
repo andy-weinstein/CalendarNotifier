@@ -27,6 +27,37 @@ struct SettingsView: View {
                     }
                 }
 
+                // Test Notifications Section
+                Section {
+                    Button {
+                        NotificationManager.shared.sendTestNotification(for: "1hour")
+                    } label: {
+                        HStack {
+                            Image(systemName: "bell.badge")
+                                .foregroundColor(.orange)
+                                .frame(width: 24)
+                            Text("Test 1-Hour Reminder")
+                                .foregroundColor(.primary)
+                        }
+                    }
+
+                    Button {
+                        NotificationManager.shared.sendTestNotification(for: "15min")
+                    } label: {
+                        HStack {
+                            Image(systemName: "bell.badge")
+                                .foregroundColor(.red)
+                                .frame(width: 24)
+                            Text("Test 15-Minute Reminder")
+                                .foregroundColor(.primary)
+                        }
+                    }
+                } header: {
+                    Text("Test Notifications")
+                } footer: {
+                    Text("Send a test notification to verify sounds work correctly with your device")
+                }
+
                 // Account Section
                 Section("Account") {
                     HStack {
