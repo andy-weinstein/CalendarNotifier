@@ -3,13 +3,33 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var calendarManager = GoogleCalendarManager.shared
+    @StateObject private var soundSettings = SoundSettingsManager.shared
     @State private var showingSoundSettings = false
 
     var body: some View {
         NavigationView {
             List {
-                // Notifications Section
-                Section("Notifications") {
+                // Reminder Times Section
+                Section {
+                    Picker("First Reminder", selection: $soundSettings.firstReminderMinutes) {
+                        ForEach(SoundSettingsManager.availableReminderTimes, id: \.minutes) { time in
+                            Text(time.label).tag(time.minutes)
+                        }
+                    }
+
+                    Picker("Second Reminder", selection: $soundSettings.secondReminderMinutes) {
+                        ForEach(SoundSettingsManager.availableReminderTimes, id: \.minutes) { time in
+                            Text(time.label).tag(time.minutes)
+                        }
+                    }
+                } header: {
+                    Text("Reminder Times")
+                } footer: {
+                    Text("Choose when to be notified before each event")
+                }
+
+                // Sounds Section
+                Section("Sounds") {
                     Button {
                         showingSoundSettings = true
                     } label: {
@@ -30,25 +50,25 @@ struct SettingsView: View {
                 // Test Notifications Section
                 Section {
                     Button {
-                        NotificationManager.shared.sendTestNotification(for: "1hour")
+                        NotificationManager.shared.sendTestNotification(for: "first")
                     } label: {
                         HStack {
                             Image(systemName: "bell.badge")
                                 .foregroundColor(.orange)
                                 .frame(width: 24)
-                            Text("Test 1-Hour Reminder")
+                            Text("Test First Reminder")
                                 .foregroundColor(.primary)
                         }
                     }
 
                     Button {
-                        NotificationManager.shared.sendTestNotification(for: "15min")
+                        NotificationManager.shared.sendTestNotification(for: "second")
                     } label: {
                         HStack {
                             Image(systemName: "bell.badge")
                                 .foregroundColor(.red)
                                 .frame(width: 24)
-                            Text("Test 15-Minute Reminder")
+                            Text("Test Second Reminder")
                                 .foregroundColor(.primary)
                         }
                     }

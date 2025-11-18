@@ -9,19 +9,19 @@ class NotificationManager {
     func scheduleNotifications(for event: CalendarEvent) {
         let settings = SoundSettingsManager.shared
 
-        // Schedule 1-hour notification with configured sound
+        // Schedule first reminder with configured time and sound
         scheduleNotification(
             for: event,
-            minutesBefore: 60,
-            identifier: "\(event.id)-1hour",
+            minutesBefore: settings.firstReminderMinutes,
+            identifier: "\(event.id)-first",
             sound: soundForId(settings.oneHourSound)
         )
 
-        // Schedule 15-minute notification with configured sound
+        // Schedule second reminder with configured time and sound
         scheduleNotification(
             for: event,
-            minutesBefore: 15,
-            identifier: "\(event.id)-15min",
+            minutesBefore: settings.secondReminderMinutes,
+            identifier: "\(event.id)-second",
             sound: soundForId(settings.fifteenMinSound)
         )
     }
@@ -89,8 +89,8 @@ class NotificationManager {
     
     func cancelNotifications(for eventID: String) {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [
-            "\(eventID)-1hour",
-            "\(eventID)-15min"
+            "\(eventID)-first",
+            "\(eventID)-second"
         ])
     }
 
@@ -100,14 +100,16 @@ class NotificationManager {
         let title: String
         let body: String
 
-        if reminderType == "1hour" {
+        if reminderType == "first" {
             sound = soundForId(settings.oneHourSound)
-            title = "Test: 1-Hour Reminder"
-            body = "This is how your 1-hour reminder will sound"
+            let timeLabel = SoundSettingsManager.availableReminderTimes.first { $0.minutes == settings.firstReminderMinutes }?.label ?? "\(settings.firstReminderMinutes) min"
+            title = "Test: First Reminder"
+            body = "This is how your \(timeLabel) reminder will sound"
         } else {
             sound = soundForId(settings.fifteenMinSound)
-            title = "Test: 15-Minute Reminder"
-            body = "This is how your 15-minute reminder will sound"
+            let timeLabel = SoundSettingsManager.availableReminderTimes.first { $0.minutes == settings.secondReminderMinutes }?.label ?? "\(settings.secondReminderMinutes) min"
+            title = "Test: Second Reminder"
+            body = "This is how your \(timeLabel) reminder will sound"
         }
 
         let content = UNMutableNotificationContent()

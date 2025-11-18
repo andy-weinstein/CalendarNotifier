@@ -19,6 +19,29 @@ class SoundSettingsManager: ObservableObject {
         }
     }
 
+    @Published var firstReminderMinutes: Int {
+        didSet {
+            UserDefaults.standard.set(firstReminderMinutes, forKey: "firstReminderMinutes")
+        }
+    }
+
+    @Published var secondReminderMinutes: Int {
+        didSet {
+            UserDefaults.standard.set(secondReminderMinutes, forKey: "secondReminderMinutes")
+        }
+    }
+
+    // Available reminder times
+    static let availableReminderTimes: [(minutes: Int, label: String)] = [
+        (5, "5 minutes"),
+        (10, "10 minutes"),
+        (15, "15 minutes"),
+        (30, "30 minutes"),
+        (60, "1 hour"),
+        (120, "2 hours"),
+        (1440, "1 day")
+    ]
+
     // Available system sounds
     static let availableSounds: [(id: String, name: String)] = [
         ("default", "Default"),
@@ -51,6 +74,12 @@ class SoundSettingsManager: ObservableObject {
     private init() {
         oneHourSound = UserDefaults.standard.string(forKey: "oneHourSound") ?? "default"
         fifteenMinSound = UserDefaults.standard.string(forKey: "fifteenMinSound") ?? "Tri-tone"
+
+        let savedFirst = UserDefaults.standard.integer(forKey: "firstReminderMinutes")
+        firstReminderMinutes = savedFirst > 0 ? savedFirst : 60
+
+        let savedSecond = UserDefaults.standard.integer(forKey: "secondReminderMinutes")
+        secondReminderMinutes = savedSecond > 0 ? savedSecond : 15
     }
 }
 
