@@ -12,23 +12,23 @@ class NotificationManager {
             for: event,
             minutesBefore: 60,
             identifier: "\(event.id)-1hour",
-            soundName: "notification_1hour.caf" // Custom sound for 1 hour
+            sound: .default // Gentle sound for 1 hour warning
         )
-        
+
         // Schedule 15-minute notification with second tone
         scheduleNotification(
             for: event,
             minutesBefore: 15,
             identifier: "\(event.id)-15min",
-            soundName: "notification_15min.caf" // Custom sound for 15 min
+            sound: UNNotificationSound(named: UNNotificationSoundName("Tri-tone")) // More urgent for 15 min
         )
     }
-    
+
     private func scheduleNotification(
         for event: CalendarEvent,
         minutesBefore: Int,
         identifier: String,
-        soundName: String
+        sound: UNNotificationSound
     ) {
         let content = UNMutableNotificationContent()
         content.title = event.title
@@ -36,8 +36,7 @@ class NotificationManager {
         if let location = event.location {
             content.subtitle = location
         }
-        content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
-        
+        content.sound = sound      
         // Calculate trigger date
         guard let triggerDate = Calendar.current.date(byAdding: .minute, value: -minutesBefore, to: event.startDate) else {
             return
