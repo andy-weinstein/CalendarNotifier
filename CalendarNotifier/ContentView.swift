@@ -4,7 +4,8 @@ struct ContentView: View {
     @StateObject private var calendarManager = GoogleCalendarManager.shared
     @StateObject private var syncManager = CalendarSyncManager.shared
     @State private var showingAuth = false
-    @State private var showingSoundSettings = false
+    @State private var showingSettings = false
+    @State private var showingEventList = false
 
     var body: some View {
         NavigationView {
@@ -17,8 +18,11 @@ struct ContentView: View {
         .sheet(isPresented: $showingAuth) {
             GoogleAuthView()
         }
-        .sheet(isPresented: $showingSoundSettings) {
-            SoundSettingsView()
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+        }
+        .sheet(isPresented: $showingEventList) {
+            EventListView()
         }
     }
 
@@ -48,41 +52,29 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
 
                 Button {
-                    showingSoundSettings = true
+                    showingEventList = true
                 } label: {
                     HStack {
-                        Image(systemName: "speaker.wave.2")
-                        Text("Configure Sounds")
+                        Image(systemName: "list.bullet.rectangle")
+                        Text("Show My Day")
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    showingSettings = true
+                } label: {
+                    HStack {
+                        Image(systemName: "gearshape")
+                        Text("Settings")
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
             }
             .padding(.horizontal, 40)
-
-            // Status Section
-            VStack(spacing: 8) {
-                HStack(spacing: 4) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                        .font(.caption)
-                    Text("Connected")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                Text("Last synced: \(calendarManager.lastSyncDate?.formatted() ?? "Never")")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-
-                Button("Sign Out") {
-                    calendarManager.signOut()
-                }
-                .font(.caption)
-                .foregroundColor(.red)
-                .padding(.top, 4)
-            }
-            .padding(.vertical, 20)
+            .padding(.bottom, 30)
         }
         .navigationTitle("Calendar Notifier")
         .onAppear {
