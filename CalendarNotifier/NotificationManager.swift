@@ -7,21 +7,30 @@ class NotificationManager {
     private init() {}
     
     func scheduleNotifications(for event: CalendarEvent) {
-        // Schedule 1-hour notification with first tone
+        let settings = SoundSettingsManager.shared
+
+        // Schedule 1-hour notification with configured sound
         scheduleNotification(
             for: event,
             minutesBefore: 60,
             identifier: "\(event.id)-1hour",
-            sound: .default // Gentle sound for 1 hour warning
+            sound: soundForId(settings.oneHourSound)
         )
 
-        // Schedule 15-minute notification with second tone
+        // Schedule 15-minute notification with configured sound
         scheduleNotification(
             for: event,
             minutesBefore: 15,
             identifier: "\(event.id)-15min",
-            sound: UNNotificationSound(named: UNNotificationSoundName("Tri-tone")) // More urgent for 15 min
+            sound: soundForId(settings.fifteenMinSound)
         )
+    }
+
+    private func soundForId(_ soundId: String) -> UNNotificationSound {
+        if soundId == "default" {
+            return .default
+        }
+        return UNNotificationSound(named: UNNotificationSoundName(rawValue: soundId))
     }
 
     private func scheduleNotification(
