@@ -2,66 +2,182 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var calendarManager = GoogleCalendarManager.shared
+    @StateObject private var syncManager = CalendarSyncManager.shared
     @State private var showingAuth = false
-    
+    @State private var showingSoundSettings = false
+
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                if calendarManager.isAuthenticated {
-                    VStack(spacing: 15) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 60))
-                            .foregroundColor(.green)
-                        
-                        Text("Connected to Google Calendar")
-                            .font(.headline)
-                        
-                        Text("Last synced: \(calendarManager.lastSyncDate?.formatted() ?? "Never")")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Button("Sync Now") {
-                            Task {
-                                await CalendarSyncManager.shared.syncCalendar()
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        
-                        Button("Sign Out") {
-                            calendarManager.signOut()
-                        }
-                        .buttonStyle(.bordered)
-                        .foregroundColor(.red)
-                    }
-                } else {
-                    VStack(spacing: 15) {
-                        Image(systemName: "calendar.badge.clock")
-                            .font(.system(size: 60))
-                            .foregroundColor(.blue)
-                        
-                        Text("Calendar Notifier")
-                            .font(.title)
-                            .bold()
-                        
-                        Text("Get notifications 1 hour and 15 minutes before your events")
-                            .font(.subheadline)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal)
-                        
-                        Button("Connect Google Calendar") {
-                            showingAuth = true
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .padding(.top)
-                    }
-                }
-            }
-            .padding()
-            .navigationTitle("Calendar Notifier")
-            .sheet(isPresented: $showingAuth) {
-                GoogleAuthView()
+            if calendarManager.isAuthenticated {
+                authenticatedView
+            } else {
+                unauthenticatedView
             }
         }
+        .sheet(isPresented: $showingAuth) {
+            GoogleAuthView()
+        }
+        .sheet(isPresented: $showingSoundSettings) {
+            SoundSettingsView()
+        }
+    }
+
+    // MARK: - Authenticated View
+
+    private var authenticatedView: some View {
+        VStack(spacing: 0) {
+            // Next Event Section
+            nextEventSection
+                .padding(.top, 20)
+
+            Spacer()
+
+            // Action Buttons
+            VStack(spacing: 12) {
+                Button {
+                    Task {
+                        await syncManager.syncCalendar()
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                        Text("Sync Now")
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button {
+                    showingSoundSettings = true
+                } label: {
+                    HStack {
+                        Image(systemName: "speaker.wave.2")
+                        Text("Configure Sounds")
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding(.horizontal, 40)
+
+            // Status Section
+            VStack(spacing: 8) {
+                HStack(spacing: 4) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                    Text("Connected")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Text("Last synced: \(calendarManager.lastSyncDate?.formatted() ?? "Never")")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+
+                Button("Sign Out") {
+                    calendarManager.signOut()
+                }
+                .font(.caption)
+                .foregroundColor(.red)
+                .padding(.top, 4)
+            }
+            .padding(.vertical, 20)
+        }
+        .navigationTitle("Calendar Notifier")
+    }
+
+    // MARK: - Next Event Section
+
+    private var nextEventSection: some View {
+        VStack(spacing: 16) {
+            if let event = syncManager.nextEvent {
+                Text("NEXT EVENT")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.secondary)
+                    .tracking(1.5)
+
+                VStack(spacing: 8) {
+                    // Day of week
+                    Text(event.startDate.formatted(.dateTime.weekday(.wide)))
+                        .font(.system(size: 28, weight: .light))
+
+                    // Date
+                    Text(event.startDate.formatted(.dateTime.month(.wide).day()))
+                        .font(.system(size: 34, weight: .bold))
+
+                    // Time
+                    Text(event.startDate.formatted(.dateTime.hour().minute()))
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundColor(.blue)
+                }
+
+                // Event details
+                VStack(spacing: 4) {
+                    Text(event.title)
+                        .font(.title3)
+                        .fontWeight(.medium)
+                        .multilineTextAlignment(.center)
+
+                    if let location = event.location, !location.isEmpty {
+                        HStack(spacing: 4) {
+                            Image(systemName: "mappin")
+                                .font(.caption)
+                            Text(location)
+                                .font(.subheadline)
+                        }
+                        .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.top, 8)
+
+            } else {
+                VStack(spacing: 12) {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 50))
+                        .foregroundColor(.secondary)
+
+                    Text("No Upcoming Events")
+                        .font(.title2)
+                        .fontWeight(.medium)
+
+                    Text("Tap Sync Now to refresh your calendar")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, 40)
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    // MARK: - Unauthenticated View
+
+    private var unauthenticatedView: some View {
+        VStack(spacing: 15) {
+            Image(systemName: "calendar.badge.clock")
+                .font(.system(size: 60))
+                .foregroundColor(.blue)
+
+            Text("Calendar Notifier")
+                .font(.title)
+                .bold()
+
+            Text("Get notifications 1 hour and 15 minutes before your events")
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+
+            Button("Connect Google Calendar") {
+                showingAuth = true
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.top)
+        }
+        .padding()
+        .navigationTitle("Calendar Notifier")
     }
 }

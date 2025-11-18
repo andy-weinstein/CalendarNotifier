@@ -1,13 +1,27 @@
 import Foundation
+import Combine
 
-class CalendarSyncManager {
+class CalendarSyncManager: ObservableObject {
     static let shared = CalendarSyncManager()
-    
+
+    @Published var events: [CalendarEvent] = []
+
     private let userDefaults = UserDefaults.standard
     private let syncedEventsKey = "syncedEvents"
-    
-    private init() {}
-    
+
+    private init() {
+        // Load cached events on init
+        events = loadSyncedEvents()
+    }
+
+    var nextEvent: CalendarEvent? {
+        let now = Date()
+        return events
+            .filter { $0.startDate > now }
+            .sorted { $0.startDate < $1.startDate }
+            .first
+    }
+
     func syncCalendar() async {
         await withCheckedContinuation { continuation in
             GoogleCalendarManager.shared.fetchEvents { [weak self] events in
@@ -40,7 +54,12 @@ class CalendarSyncManager {
         
         // Save synced events
         saveSyncedEvents(newEvents)
-        
+
+        // Update published events on main thread
+        DispatchQueue.main.async {
+            self.events = newEvents
+        }
+
         print("Synced \(newEvents.count) events")
     }
     
