@@ -27,10 +27,11 @@ class NotificationManager {
     }
 
     private func soundForId(_ soundId: String) -> UNNotificationSound {
-        if soundId == "default" {
-            return .default
-        }
-        return UNNotificationSound(named: UNNotificationSoundName(rawValue: soundId))
+        // Note: iOS only allows .default or custom sounds bundled with the app
+        // System sounds like "Tri-tone" cannot be used in notifications
+        // All selections will use the default notification sound
+        // To use different sounds, add .caf/.aiff/.wav files to the app bundle
+        return .default
     }
 
     private func scheduleNotification(
