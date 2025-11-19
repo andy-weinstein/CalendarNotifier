@@ -11,19 +11,11 @@ echo "Extracting system sounds..."
 # Source directory for system sounds
 SYS_SOUNDS="/System/Library/Audio/UISounds"
 
-# Define sound mappings (source name -> our name)
-declare -A sounds
-sounds["sms-received1.caf"]="alert_high.caf"
-sounds["sms-received2.caf"]="alert_low.caf"
-sounds["new-mail.caf"]="chime.caf"
-sounds["mail-sent.caf"]="glass.caf"
-sounds["Tink.caf"]="horn.caf"
-sounds["Tock.caf"]="bell.caf"
-sounds["Morse.caf"]="electronic.caf"
+# Copy sounds with simple approach
+copy_sound() {
+    local src="$1"
+    local dest="$2"
 
-# Copy and rename sounds
-for src in "${!sounds[@]}"; do
-    dest="${sounds[$src]}"
     if [ -f "$SYS_SOUNDS/$src" ]; then
         cp "$SYS_SOUNDS/$src" "$SOUNDS_DIR/$dest"
         echo "  Copied $src -> $dest"
@@ -33,7 +25,16 @@ for src in "${!sounds[@]}"; do
     else
         echo "  Warning: $src not found"
     fi
-done
+}
+
+# Copy each sound
+copy_sound "sms-received1.caf" "alert_high.caf"
+copy_sound "sms-received2.caf" "alert_low.caf"
+copy_sound "new-mail.caf" "chime.caf"
+copy_sound "mail-sent.caf" "glass.caf"
+copy_sound "Tink.caf" "horn.caf"
+copy_sound "Tock.caf" "bell.caf"
+copy_sound "Morse.caf" "electronic.caf"
 
 echo ""
 echo "Sound files created in $SOUNDS_DIR"
