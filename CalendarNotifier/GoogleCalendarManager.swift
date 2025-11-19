@@ -31,25 +31,31 @@ class GoogleCalendarManager: ObservableObject {
             completion(false)
             return
         }
-        
+
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
-        
+
         GIDSignIn.sharedInstance.signIn(
             withPresenting: rootViewController,
             hint: nil,
             additionalScopes: ["https://www.googleapis.com/auth/calendar.readonly"]
         ) { [weak self] result, error in
             guard error == nil, let user = result?.user else {
-                completion(false)
+                DispatchQueue.main.async {
+                    completion(false)
+                }
                 return
             }
-            
-            self?.calendarService.authorizer = user.fetcherAuthorizer
+
+            // Set authorizer on main thread to avoid threading issues
             DispatchQueue.main.async {
+                self?.calendarService.authorizer = user.fetcherAuthorizer
                 self?.isAuthenticated = true
+                // Small delay to ensure authorizer is fully initialized
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    completion(true)
+                }
             }
-            completion(true)
         }
     }
     
@@ -66,12 +72,19 @@ class GoogleCalendarManager: ObservableObject {
     }
     
     func fetchEvents(completion: @escaping ([CalendarEvent]) -> Void) {
+        // Ensure we have an authorizer before fetching
+        guard calendarService.authorizer != nil else {
+            print("No authorizer set, cannot fetch events")
+            completion([])
+            return
+        }
+
         let query = GTLRCalendarQuery_EventsList.query(withCalendarId: "primary")
         query.timeMin = GTLRDateTime(date: Date())
         query.timeMax = GTLRDateTime(date: Calendar.current.date(byAdding: .day, value: 30, to: Date())!)
         query.singleEvents = true
         query.orderBy = kGTLRCalendarOrderByStartTime
-        
+
         calendarService.executeQuery(query) { [weak self] (ticket, response, error) in
             guard error == nil,
                   let events = (response as? GTLRCalendar_Events)?.items else {
