@@ -41,6 +41,7 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationTitle("Calendar Notifier")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Authenticated View
@@ -111,6 +112,7 @@ struct ContentView: View {
             .padding(.bottom, 30)
         }
         .navigationTitle("Calendar Notifier")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             // Auto-sync when app launches
             Task {
@@ -220,5 +222,6 @@ struct ContentView: View {
         }
         .padding()
         .navigationTitle("Calendar Notifier")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
