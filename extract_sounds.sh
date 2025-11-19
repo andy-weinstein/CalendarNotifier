@@ -72,11 +72,13 @@ echo "  Warning: Could not find alert_high sound"
 copy_sound "sms-received2.caf" "alert_low.caf" || \
 copy_sound "SentMessage.caf" "alert_low.caf" || \
 copy_sound "Tock.caf" "alert_low.caf" || \
+copy_sound "Tink.aiff" "alert_low.caf" || \
 echo "  Warning: Could not find alert_low sound"
 
 copy_sound "new-mail.caf" "chime.caf" || \
 copy_sound "mail-sent.caf" "chime.caf" || \
 copy_sound "Chime.caf" "chime.caf" || \
+copy_sound "Ping.aiff" "chime.caf" || \
 echo "  Warning: Could not find chime sound"
 
 copy_sound "payment_success.caf" "glass.caf" || \
@@ -92,6 +94,7 @@ echo "  Warning: Could not find horn sound"
 copy_sound "nano/3rdParty_DirectionUp_Haptic.caf" "bell.caf" || \
 copy_sound "RingerChanged.caf" "bell.caf" || \
 copy_sound "Bell.caf" "bell.caf" || \
+copy_sound "Hero.aiff" "bell.caf" || \
 echo "  Warning: Could not find bell sound"
 
 copy_sound "key_press_click.caf" "electronic.caf" || \
