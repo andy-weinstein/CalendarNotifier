@@ -15,16 +15,14 @@ class GoogleCalendarManager: ObservableObject {
     private let clientID = "688632885106-p0mle40kksuii21vgtt184cd65g1q6au.apps.googleusercontent.com"
     
     private init() {
-        checkAuthStatus()
+        // Always try to restore previous sign-in on init
+        restoreAuthSession()
     }
-    
+
     func checkAuthStatus() {
         isAuthenticated = GIDSignIn.sharedInstance.currentUser != nil
-        if isAuthenticated {
-            restoreAuthSession()
-        }
     }
-    
+
     func signIn(completion: @escaping (Bool) -> Void) {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let rootViewController = windowScene.windows.first?.rootViewController else {
@@ -58,16 +56,23 @@ class GoogleCalendarManager: ObservableObject {
             }
         }
     }
-    
+
     func signOut() {
         GIDSignIn.sharedInstance.signOut()
         isAuthenticated = false
+        calendarService.authorizer = nil
     }
-    
+
     private func restoreAuthSession() {
         GIDSignIn.sharedInstance.restorePreviousSignIn { [weak self] user, error in
-            guard error == nil, let user = user else { return }
-            self?.calendarService.authorizer = user.fetcherAuthorizer
+            DispatchQueue.main.async {
+                if let user = user, error == nil {
+                    self?.calendarService.authorizer = user.fetcherAuthorizer
+                    self?.isAuthenticated = true
+                } else {
+                    self?.isAuthenticated = false
+                }
+            }
         }
     }
     
