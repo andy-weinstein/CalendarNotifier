@@ -3,6 +3,9 @@ import SwiftUI
 struct EventListView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var syncManager = CalendarSyncManager.shared
+    @StateObject private var soundSettings = SoundSettingsManager.shared
+
+    private var isBigger: Bool { soundSettings.biggerMode }
 
     var body: some View {
         NavigationView {
@@ -50,18 +53,18 @@ struct EventListView: View {
     // MARK: - Views
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: isBigger ? 24 : 16) {
             Image(systemName: "calendar")
-                .font(.largeTitle)
+                .font(isBigger ? .system(size: 48) : .largeTitle)
                 .foregroundColor(.secondary)
                 .accessibilityHidden(true)
 
             Text("No Events")
-                .font(.title2)
+                .font(isBigger ? .title : .title2)
                 .fontWeight(.medium)
 
             Text("Your calendar is clear")
-                .font(.subheadline)
+                .font(isBigger ? .body : .subheadline)
                 .foregroundColor(.secondary)
         }
         .accessibilityElement(children: .combine)
@@ -93,13 +96,16 @@ struct EventListView: View {
 struct EventRow: View {
     let event: CalendarEvent
     let showDate: Bool
+    @StateObject private var soundSettings = SoundSettingsManager.shared
+
+    private var isBigger: Bool { soundSettings.biggerMode }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: isBigger ? 10 : 6) {
             // Time and optional date
             HStack {
                 Text(event.startDate.formatted(.dateTime.hour().minute()))
-                    .font(.subheadline)
+                    .font(isBigger ? .body : .subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(.blue)
 
@@ -108,24 +114,24 @@ struct EventRow: View {
                         .foregroundColor(.secondary)
                         .accessibilityHidden(true)
                     Text(event.startDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
-                        .font(.caption)
+                        .font(isBigger ? .subheadline : .caption)
                         .foregroundColor(.secondary)
                 }
             }
 
             // Title
             Text(event.title)
-                .font(.body)
+                .font(isBigger ? .title3 : .body)
                 .fontWeight(.medium)
 
             // Location
             if let location = event.location, !location.isEmpty {
-                HStack(spacing: 4) {
+                HStack(spacing: isBigger ? 6 : 4) {
                     Image(systemName: "mappin")
-                        .font(.caption2)
+                        .font(isBigger ? .caption : .caption2)
                         .accessibilityHidden(true)
                     Text(location)
-                        .font(.caption)
+                        .font(isBigger ? .subheadline : .caption)
                 }
                 .foregroundColor(.secondary)
                 .accessibilityLabel("Location: \(location)")
@@ -139,13 +145,13 @@ struct EventRow: View {
 
                 if !cleanDescription.isEmpty {
                     Text(cleanDescription)
-                        .font(.caption)
+                        .font(isBigger ? .subheadline : .caption)
                         .foregroundColor(.secondary)
                         .lineLimit(2)
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, isBigger ? 8 : 4)
         .accessibilityElement(children: .combine)
     }
 }

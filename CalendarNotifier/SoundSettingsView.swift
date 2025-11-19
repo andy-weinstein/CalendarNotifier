@@ -31,6 +31,12 @@ class SoundSettingsManager: ObservableObject {
         }
     }
 
+    @Published var biggerMode: Bool {
+        didSet {
+            UserDefaults.standard.set(biggerMode, forKey: "biggerMode")
+        }
+    }
+
     // Available reminder times
     static let availableReminderTimes: [(minutes: Int, label: String)] = [
         (5, "5 minutes"),
@@ -64,6 +70,13 @@ class SoundSettingsManager: ObservableObject {
 
         let savedSecond = UserDefaults.standard.integer(forKey: "secondReminderMinutes")
         secondReminderMinutes = savedSecond > 0 ? savedSecond : 15
+
+        // Bigger mode defaults to true for visually impaired users
+        if UserDefaults.standard.object(forKey: "biggerMode") == nil {
+            biggerMode = true
+        } else {
+            biggerMode = UserDefaults.standard.bool(forKey: "biggerMode")
+        }
     }
 }
 
@@ -73,6 +86,8 @@ struct SoundSettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var settings = SoundSettingsManager.shared
     @State private var audioPlayer: AVAudioPlayer?
+
+    private var isBigger: Bool { settings.biggerMode }
 
     var body: some View {
         NavigationView {
@@ -94,8 +109,10 @@ struct SoundSettingsView: View {
                     }
                 } header: {
                     Text("First Reminder Sound")
+                        .font(isBigger ? .subheadline : .footnote)
                 } footer: {
                     Text("Sound for your first reminder")
+                        .font(isBigger ? .subheadline : .footnote)
                 }
 
                 // Second Reminder Section
@@ -115,8 +132,10 @@ struct SoundSettingsView: View {
                     }
                 } header: {
                     Text("Second Reminder Sound")
+                        .font(isBigger ? .subheadline : .footnote)
                 } footer: {
                     Text("Sound for your second reminder")
+                        .font(isBigger ? .subheadline : .footnote)
                 }
             }
             .navigationTitle("Configure Sounds")
@@ -126,6 +145,7 @@ struct SoundSettingsView: View {
                     Button("Done") {
                         dismiss()
                     }
+                    .font(isBigger ? .body : .body)
                 }
             }
         }
@@ -167,6 +187,9 @@ struct SoundRow: View {
     let isSelected: Bool
     let onSelect: () -> Void
     let onPreview: () -> Void
+    @StateObject private var soundSettings = SoundSettingsManager.shared
+
+    private var isBigger: Bool { soundSettings.biggerMode }
 
     var body: some View {
         HStack {
@@ -176,8 +199,10 @@ struct SoundRow: View {
                 HStack {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(isSelected ? .blue : .gray)
+                        .font(isBigger ? .title3 : .body)
 
                     Text(soundName)
+                        .font(isBigger ? .body : .body)
                         .foregroundColor(.primary)
 
                     Spacer()
@@ -190,8 +215,10 @@ struct SoundRow: View {
             } label: {
                 Image(systemName: "speaker.wave.2")
                     .foregroundColor(.blue)
+                    .font(isBigger ? .title3 : .body)
             }
             .buttonStyle(.plain)
         }
+        .padding(.vertical, isBigger ? 4 : 0)
     }
 }
