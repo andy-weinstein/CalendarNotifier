@@ -9,7 +9,9 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            if calendarManager.isAuthenticated {
+            if calendarManager.isRestoring {
+                restoringView
+            } else if calendarManager.isAuthenticated {
                 authenticatedView
             } else {
                 unauthenticatedView
@@ -24,6 +26,21 @@ struct ContentView: View {
         .sheet(isPresented: $showingEventList) {
             EventListView()
         }
+    }
+
+    // MARK: - Restoring View
+
+    private var restoringView: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .scaleEffect(1.5)
+
+            Text("Connecting...")
+                .font(.headline)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationTitle("Calendar Notifier")
     }
 
     // MARK: - Authenticated View

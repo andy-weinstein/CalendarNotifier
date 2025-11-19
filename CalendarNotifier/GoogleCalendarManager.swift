@@ -7,13 +7,14 @@ import GoogleAPIClientForREST_Calendar
 
 class GoogleCalendarManager: ObservableObject {
     static let shared = GoogleCalendarManager()
-    
+
     @Published var isAuthenticated = false
+    @Published var isRestoring = true  // Show loading while checking auth
     @Published var lastSyncDate: Date?
-    
+
     private let calendarService = GTLRCalendarService()
     private let clientID = "688632885106-p0mle40kksuii21vgtt184cd65g1q6au.apps.googleusercontent.com"
-    
+
     private init() {
         // Always try to restore previous sign-in on init
         restoreAuthSession()
@@ -72,6 +73,7 @@ class GoogleCalendarManager: ObservableObject {
                 } else {
                     self?.isAuthenticated = false
                 }
+                self?.isRestoring = false  // Done restoring
             }
         }
     }
