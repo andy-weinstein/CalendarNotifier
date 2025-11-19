@@ -43,16 +43,16 @@ class SoundSettingsManager: ObservableObject {
     ]
 
     // Available bundled sounds (must be added to Xcode project)
-    // Format: (filename without extension, display name, system sound ID for preview)
-    static let availableSounds: [(id: String, name: String, previewId: SystemSoundID)] = [
-        ("default", "Default", 1007),
-        ("alert_high", "Alert (High)", 1005),
-        ("alert_low", "Alert (Low)", 1006),
-        ("chime", "Chime", 1008),
-        ("glass", "Glass", 1009),
-        ("horn", "Horn", 1010),
-        ("bell", "Bell", 1011),
-        ("electronic", "Electronic", 1012)
+    // Format: (filename without extension, display name)
+    static let availableSounds: [(id: String, name: String)] = [
+        ("default", "Default"),
+        ("alert_high", "Alert (High)"),
+        ("alert_low", "Alert (Low)"),
+        ("chime", "Chime"),
+        ("glass", "Glass"),
+        ("horn", "Horn"),
+        ("bell", "Bell"),
+        ("electronic", "Electronic")
     ]
 
     private init() {
@@ -72,6 +72,7 @@ class SoundSettingsManager: ObservableObject {
 struct SoundSettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var settings = SoundSettingsManager.shared
+    @State private var audioPlayer: AVAudioPlayer?
 
     var body: some View {
         NavigationView {
@@ -87,7 +88,7 @@ struct SoundSettingsView: View {
                                 settings.oneHourSound = sound.id
                             },
                             onPreview: {
-                                AudioServicesPlaySystemSound(sound.previewId)
+                                playBundledSound(sound.id)
                             }
                         )
                     }
@@ -108,7 +109,7 @@ struct SoundSettingsView: View {
                                 settings.fifteenMinSound = sound.id
                             },
                             onPreview: {
-                                AudioServicesPlaySystemSound(sound.previewId)
+                                playBundledSound(sound.id)
                             }
                         )
                     }
@@ -127,6 +128,33 @@ struct SoundSettingsView: View {
                     }
                 }
             }
+        }
+    }
+
+    private func playBundledSound(_ soundId: String) {
+        // Stop any currently playing sound
+        audioPlayer?.stop()
+
+        if soundId == "default" {
+            // Play default system notification sound
+            AudioServicesPlaySystemSound(1007)
+            return
+        }
+
+        // Play the bundled .caf file
+        guard let url = Bundle.main.url(forResource: soundId, withExtension: "caf") else {
+            print("Could not find bundled sound: \(soundId).caf")
+            // Fallback to system sound
+            AudioServicesPlaySystemSound(1007)
+            return
+        }
+
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.play()
+        } catch {
+            print("Error playing sound: \(error)")
+            AudioServicesPlaySystemSound(1007)
         }
     }
 }
