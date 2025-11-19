@@ -42,38 +42,22 @@ class SoundSettingsManager: ObservableObject {
         (1440, "1 day")
     ]
 
-    // Available system sounds
-    static let availableSounds: [(id: String, name: String)] = [
-        ("default", "Default"),
-        ("Tri-tone", "Tri-tone"),
-        ("Chime", "Chime"),
-        ("Glass", "Glass"),
-        ("Horn", "Horn"),
-        ("Bell", "Bell"),
-        ("Electronic", "Electronic"),
-        ("Anticipate", "Anticipate"),
-        ("Bloom", "Bloom"),
-        ("Calypso", "Calypso"),
-        ("Choo_Choo", "Choo Choo"),
-        ("Descent", "Descent"),
-        ("Ding", "Ding"),
-        ("Fanfare", "Fanfare"),
-        ("Ladder", "Ladder"),
-        ("Minuet", "Minuet"),
-        ("News_Flash", "News Flash"),
-        ("Noir", "Noir"),
-        ("Sherwood_Forest", "Sherwood Forest"),
-        ("Spell", "Spell"),
-        ("Suspense", "Suspense"),
-        ("Telegraph", "Telegraph"),
-        ("Tiptoes", "Tiptoes"),
-        ("Typewriters", "Typewriters"),
-        ("Update", "Update")
+    // Available bundled sounds (must be added to Xcode project)
+    // Format: (filename without extension, display name, system sound ID for preview)
+    static let availableSounds: [(id: String, name: String, previewId: SystemSoundID)] = [
+        ("default", "Default", 1007),
+        ("alert_high", "Alert (High)", 1005),
+        ("alert_low", "Alert (Low)", 1006),
+        ("chime", "Chime", 1008),
+        ("glass", "Glass", 1009),
+        ("horn", "Horn", 1010),
+        ("bell", "Bell", 1011),
+        ("electronic", "Electronic", 1012)
     ]
 
     private init() {
         oneHourSound = UserDefaults.standard.string(forKey: "oneHourSound") ?? "default"
-        fifteenMinSound = UserDefaults.standard.string(forKey: "fifteenMinSound") ?? "Tri-tone"
+        fifteenMinSound = UserDefaults.standard.string(forKey: "fifteenMinSound") ?? "bell"
 
         let savedFirst = UserDefaults.standard.integer(forKey: "firstReminderMinutes")
         firstReminderMinutes = savedFirst > 0 ? savedFirst : 60
@@ -88,12 +72,11 @@ class SoundSettingsManager: ObservableObject {
 struct SoundSettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var settings = SoundSettingsManager.shared
-    @State private var audioPlayer: AVAudioPlayer?
 
     var body: some View {
         NavigationView {
             List {
-                // 1-Hour Reminder Section
+                // First Reminder Section
                 Section {
                     ForEach(SoundSettingsManager.availableSounds, id: \.id) { sound in
                         SoundRow(
@@ -104,17 +87,17 @@ struct SoundSettingsView: View {
                                 settings.oneHourSound = sound.id
                             },
                             onPreview: {
-                                playSound(sound.id)
+                                AudioServicesPlaySystemSound(sound.previewId)
                             }
                         )
                     }
                 } header: {
-                    Text("1-Hour Reminder")
+                    Text("First Reminder Sound")
                 } footer: {
-                    Text("Sound played 1 hour before events")
+                    Text("Sound for your first reminder")
                 }
 
-                // 15-Minute Reminder Section
+                // Second Reminder Section
                 Section {
                     ForEach(SoundSettingsManager.availableSounds, id: \.id) { sound in
                         SoundRow(
@@ -125,14 +108,14 @@ struct SoundSettingsView: View {
                                 settings.fifteenMinSound = sound.id
                             },
                             onPreview: {
-                                playSound(sound.id)
+                                AudioServicesPlaySystemSound(sound.previewId)
                             }
                         )
                     }
                 } header: {
-                    Text("15-Minute Reminder")
+                    Text("Second Reminder Sound")
                 } footer: {
-                    Text("Sound played 15 minutes before events")
+                    Text("Sound for your second reminder")
                 }
             }
             .navigationTitle("Configure Sounds")
@@ -144,77 +127,6 @@ struct SoundSettingsView: View {
                     }
                 }
             }
-        }
-    }
-
-    private func playSound(_ soundId: String) {
-        // Stop any currently playing sound
-        audioPlayer?.stop()
-
-        if soundId == "default" {
-            // Play system default sound
-            AudioServicesPlaySystemSound(1007) // Default notification sound
-            return
-        }
-
-        // Try to play system sound by ID
-        // System sounds are in /System/Library/Audio/UISounds/
-        let soundName = soundId
-
-        // Try common system sound locations
-        let possiblePaths = [
-            "/System/Library/Audio/UISounds/\(soundName).caf",
-            "/System/Library/Audio/UISounds/New/\(soundName).caf",
-            "/System/Library/Audio/UISounds/nano/\(soundName).caf"
-        ]
-
-        for path in possiblePaths {
-            let url = URL(fileURLWithPath: path)
-            if FileManager.default.fileExists(atPath: path) {
-                do {
-                    audioPlayer = try AVAudioPlayer(contentsOf: url)
-                    audioPlayer?.play()
-                    return
-                } catch {
-                    print("Error playing sound: \(error)")
-                }
-            }
-        }
-
-        // Fallback: use system sound ID
-        // These are some common system sound IDs
-        let systemSoundIds: [String: SystemSoundID] = [
-            "Tri-tone": 1007,
-            "Chime": 1008,
-            "Glass": 1009,
-            "Horn": 1010,
-            "Bell": 1011,
-            "Electronic": 1012,
-            "Anticipate": 1020,
-            "Bloom": 1021,
-            "Calypso": 1022,
-            "Choo_Choo": 1023,
-            "Descent": 1024,
-            "Ding": 1025,
-            "Fanfare": 1026,
-            "Ladder": 1027,
-            "Minuet": 1028,
-            "News_Flash": 1029,
-            "Noir": 1030,
-            "Sherwood_Forest": 1031,
-            "Spell": 1032,
-            "Suspense": 1033,
-            "Telegraph": 1034,
-            "Tiptoes": 1035,
-            "Typewriters": 1036,
-            "Update": 1037
-        ]
-
-        if let soundID = systemSoundIds[soundId] {
-            AudioServicesPlaySystemSound(soundID)
-        } else {
-            // Default fallback
-            AudioServicesPlaySystemSound(1007)
         }
     }
 }
