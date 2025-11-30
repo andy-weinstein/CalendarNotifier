@@ -58,7 +58,9 @@ class SoundSettingsManager: ObservableObject {
         ("glass", "Glass"),
         ("horn", "Horn"),
         ("bell", "Bell"),
-        ("electronic", "Electronic")
+        ("electronic", "Electronic"),
+        ("marimba_times_four", "Marimba Times Four"),
+        ("arpeggio", "Arpeggio")
     ]
 
     private init() {
