@@ -31,8 +31,8 @@ class NotificationManager {
             return .default
         }
         // Reference bundled sound file (must be .caf, .aiff, or .wav in app bundle)
-        // Sound files should be added to Xcode project with these names
-        return UNNotificationSound(named: UNNotificationSoundName(rawValue: "\(soundId).caf"))
+        // Sound files are in the Sounds subdirectory
+        return UNNotificationSound(named: UNNotificationSoundName(rawValue: "Sounds/\(soundId).caf"))
     }
 
     private func scheduleNotification(

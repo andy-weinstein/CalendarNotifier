@@ -164,7 +164,7 @@ struct SoundSettingsView: View {
         }
 
         // Play the bundled .caf file
-        guard let url = Bundle.main.url(forResource: soundId, withExtension: "caf") else {
+        guard let url = Bundle.main.url(forResource: soundId, withExtension: "caf", subdirectory: "Sounds") else {
             print("Could not find bundled sound: \(soundId).caf")
             // Fallback to system sound
             AudioServicesPlaySystemSound(1007)
