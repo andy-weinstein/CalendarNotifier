@@ -175,44 +175,16 @@ struct SoundSettingsView: View {
             return
         }
 
-        // Debug: List all resources in bundle
-        if let resourcePath = Bundle.main.resourcePath {
-            print("Bundle resource path: \(resourcePath)")
-            if let contents = try? FileManager.default.contentsOfDirectory(atPath: resourcePath) {
-                print("Bundle contents: \(contents.filter { $0.contains("Sound") || $0.hasSuffix(".caf") })")
-            }
-        }
-
-        // Try multiple possible paths
-        var url: URL?
-
-        // Try 1: Sounds subdirectory
-        url = Bundle.main.url(forResource: soundId, withExtension: "caf", subdirectory: "Sounds")
-        if url == nil {
-            print("Not found at: Sounds/\(soundId).caf")
-            // Try 2: CalendarNotifier/Sounds subdirectory
-            url = Bundle.main.url(forResource: soundId, withExtension: "caf", subdirectory: "CalendarNotifier/Sounds")
-            if url == nil {
-                print("Not found at: CalendarNotifier/Sounds/\(soundId).caf")
-                // Try 3: Root of bundle
-                url = Bundle.main.url(forResource: soundId, withExtension: "caf")
-                if url == nil {
-                    print("Not found at root: \(soundId).caf")
-                }
-            }
-        }
-
-        guard let soundURL = url else {
-            print("Could not find bundled sound: \(soundId).caf in any location")
+        // Sound files are at the root of the bundle
+        guard let url = Bundle.main.url(forResource: soundId, withExtension: "caf") else {
+            print("Could not find bundled sound: \(soundId).caf")
             // Fallback to system sound
             AudioServicesPlaySystemSound(1007)
             return
         }
 
-        print("Found sound at: \(soundURL.path)")
-
         do {
-            audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.play()
         } catch {
             print("Error playing sound: \(error)")
