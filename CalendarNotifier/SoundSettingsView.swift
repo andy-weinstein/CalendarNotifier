@@ -52,15 +52,17 @@ class SoundSettingsManager: ObservableObject {
     // Format: (filename without extension, display name)
     static let availableSounds: [(id: String, name: String)] = [
         ("default", "Default"),
-        ("alert_high", "Alert (High)"),
-        ("alert_low", "Alert (Low)"),
-        ("chime", "Chime"),
-        ("glass", "Glass"),
-        ("horn", "Horn"),
-        ("bell", "Bell"),
-        ("electronic", "Electronic"),
-        ("marimba_times_four", "Marimba Times Four"),
-        ("arpeggio", "Arpeggio")
+        ("arpeggio", "Arpeggio"),
+        ("Jack", "Jack"),
+        ("Kack", "Kack"),
+        ("Lack", "Lack"),
+        ("Mack", "Mack"),
+        ("Nack", "Nack"),
+        ("Ouack", "Ouack"),
+        ("Pack", "Pack"),
+        ("Quack", "Quack"),
+        ("Rack", "Rack"),
+        ("Sack", "Sack")
     ]
 
     private init() {
