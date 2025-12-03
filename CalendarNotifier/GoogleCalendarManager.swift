@@ -16,8 +16,18 @@ class GoogleCalendarManager: ObservableObject {
     private let clientID = "688632885106-p0mle40kksuii21vgtt184cd65g1q6au.apps.googleusercontent.com"
 
     private init() {
-        // Always try to restore previous sign-in on init
-        restoreAuthSession()
+        // One-time fix: Clear potentially corrupted auth from old app version
+        if !UserDefaults.standard.bool(forKey: "didClearCorruptedAuth_v1") {
+            print("Clearing potentially corrupted auth state from previous version")
+            GIDSignIn.sharedInstance.signOut()
+            calendarService.authorizer = nil
+            UserDefaults.standard.set(true, forKey: "didClearCorruptedAuth_v1")
+            isAuthenticated = false
+            isRestoring = false
+        } else {
+            // Always try to restore previous sign-in on init
+            restoreAuthSession()
+        }
     }
 
     func checkAuthStatus() {
