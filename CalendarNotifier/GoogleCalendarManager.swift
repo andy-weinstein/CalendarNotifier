@@ -67,7 +67,13 @@ class GoogleCalendarManager: ObservableObject {
     private func restoreAuthSession() {
         GIDSignIn.sharedInstance.restorePreviousSignIn { [weak self] user, error in
             DispatchQueue.main.async {
-                if let user = user, error == nil {
+                if let error = error {
+                    print("Failed to restore auth session: \(error)")
+                    // Sign out to clear potentially corrupted auth state
+                    GIDSignIn.sharedInstance.signOut()
+                    self?.isAuthenticated = false
+                    self?.calendarService.authorizer = nil
+                } else if let user = user {
                     self?.calendarService.authorizer = user.fetcherAuthorizer
                     self?.isAuthenticated = true
                 } else {
@@ -93,8 +99,19 @@ class GoogleCalendarManager: ObservableObject {
         query.orderBy = kGTLRCalendarOrderByStartTime
 
         calendarService.executeQuery(query) { [weak self] (ticket, response, error) in
-            guard error == nil,
-                  let events = (response as? GTLRCalendar_Events)?.items else {
+            if let error = error {
+                print("Error fetching events: \(error)")
+                // If auth error, clear the session
+                if (error as NSError).domain == "com.google.GTLRErrorObjectDomain" {
+                    DispatchQueue.main.async {
+                        self?.signOut()
+                    }
+                }
+                completion([])
+                return
+            }
+
+            guard let events = (response as? GTLRCalendar_Events)?.items else {
                 completion([])
                 return
             }
