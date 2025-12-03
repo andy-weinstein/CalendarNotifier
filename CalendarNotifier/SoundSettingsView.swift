@@ -64,8 +64,20 @@ class SoundSettingsManager: ObservableObject {
     ]
 
     private init() {
-        oneHourSound = UserDefaults.standard.string(forKey: "oneHourSound") ?? "default"
-        fifteenMinSound = UserDefaults.standard.string(forKey: "fifteenMinSound") ?? "bell"
+        // Safely read string values, handling potential type mismatches
+        if let soundValue = UserDefaults.standard.object(forKey: "oneHourSound") as? String {
+            oneHourSound = soundValue
+        } else {
+            oneHourSound = "default"
+            UserDefaults.standard.removeObject(forKey: "oneHourSound")
+        }
+
+        if let soundValue = UserDefaults.standard.object(forKey: "fifteenMinSound") as? String {
+            fifteenMinSound = soundValue
+        } else {
+            fifteenMinSound = "bell"
+            UserDefaults.standard.removeObject(forKey: "fifteenMinSound")
+        }
 
         let savedFirst = UserDefaults.standard.integer(forKey: "firstReminderMinutes")
         firstReminderMinutes = savedFirst > 0 ? savedFirst : 60
