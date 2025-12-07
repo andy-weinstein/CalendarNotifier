@@ -45,28 +45,46 @@ class CalendarSyncManager: ObservableObject {
     }
     
     private func processEvents(_ newEvents: [CalendarEvent]) {
+        print("\n🔄 STARTING EVENT SYNC")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
         // Get previously synced events
         let previousEvents = loadSyncedEvents()
         let previousEventIDs = Set(previousEvents.map { $0.id })
         let newEventIDs = Set(newEvents.map { $0.id })
-        
+
+        print("📊 Previous events: \(previousEvents.count)")
+        print("📊 New events: \(newEvents.count)")
+
         // Cancel notifications for removed events
         let removedEventIDs = previousEventIDs.subtracting(newEventIDs)
-        for eventID in removedEventIDs {
-            NotificationManager.shared.cancelNotifications(for: eventID)
+        if !removedEventIDs.isEmpty {
+            print("\n🗑️  Removing \(removedEventIDs.count) deleted events")
+            for eventID in removedEventIDs {
+                NotificationManager.shared.cancelNotifications(for: eventID)
+            }
         }
-        
+
         // Schedule notifications for new or updated events
-        for event in newEvents {
+        print("\n📅 Processing \(newEvents.count) events for notifications:")
+        for (index, event) in newEvents.enumerated() {
+            print("\n[\(index + 1)/\(newEvents.count)]")
+
             // Cancel existing notifications for this event
             NotificationManager.shared.cancelNotifications(for: event.id)
-            
+
             // Schedule new notifications
             NotificationManager.shared.scheduleNotifications(for: event)
         }
-        
+
         // Save synced events
         saveSyncedEvents(newEvents)
+
+        print("\n✅ Sync complete - processed \(newEvents.count) events")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+        // Log all pending notifications after sync
+        NotificationManager.shared.logPendingNotifications()
 
         // Update published events on main thread
         DispatchQueue.main.async {
@@ -82,8 +100,6 @@ class CalendarSyncManager: ObservableObject {
                 self.lastSyncCount = nil
             }
         }
-
-        print("Synced \(newEvents.count) events")
     }
     
     private func loadSyncedEvents() -> [CalendarEvent] {

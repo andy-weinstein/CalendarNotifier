@@ -102,15 +102,21 @@ class GoogleCalendarManager: ObservableObject {
             return
         }
 
+        let now = Date()
+        let maxDate = Calendar.current.date(byAdding: .day, value: 30, to: now)!
+
+        print("\n📡 FETCHING EVENTS FROM GOOGLE CALENDAR")
+        print("   Time range: \(now) to \(maxDate)")
+
         let query = GTLRCalendarQuery_EventsList.query(withCalendarId: "primary")
-        query.timeMin = GTLRDateTime(date: Date())
-        query.timeMax = GTLRDateTime(date: Calendar.current.date(byAdding: .day, value: 30, to: Date())!)
+        query.timeMin = GTLRDateTime(date: now)
+        query.timeMax = GTLRDateTime(date: maxDate)
         query.singleEvents = true
         query.orderBy = kGTLRCalendarOrderByStartTime
 
         calendarService.executeQuery(query) { [weak self] (ticket, response, error) in
             if let error = error {
-                print("Error fetching events: \(error)")
+                print("   ❌ Error fetching events: \(error.localizedDescription)")
                 // If auth error, clear the session
                 if (error as NSError).domain == "com.google.GTLRErrorObjectDomain" {
                     DispatchQueue.main.async {
@@ -122,16 +128,19 @@ class GoogleCalendarManager: ObservableObject {
             }
 
             guard let events = (response as? GTLRCalendar_Events)?.items else {
+                print("   ⚠️  No events found in response")
                 completion([])
                 return
             }
-            
+
+            print("   ✅ Fetched \(events.count) raw events from Google")
+
             let calendarEvents = events.compactMap { event -> CalendarEvent? in
                 guard let start = event.start?.dateTime?.date ?? event.start?.date?.date,
                       let title = event.summary else {
                     return nil
                 }
-                
+
                 return CalendarEvent(
                     id: event.identifier ?? UUID().uuidString,
                     title: title,
@@ -140,11 +149,13 @@ class GoogleCalendarManager: ObservableObject {
                     eventDescription: event.descriptionProperty
                 )
             }
-            
+
+            print("   ✅ Parsed \(calendarEvents.count) valid calendar events\n")
+
             DispatchQueue.main.async {
                 self?.lastSyncDate = Date()
             }
-            
+
             completion(calendarEvents)
         }
     }
