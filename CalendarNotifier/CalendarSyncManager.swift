@@ -65,16 +65,37 @@ class CalendarSyncManager: ObservableObject {
             }
         }
 
+        // iOS has a limit of 64 pending notifications per app
+        // We schedule 2 notifications per event, so limit to 32 events
+        let maxEventsForNotifications = 32
+
+        // Sort events by start date and take the nearest ones for notification scheduling
+        let sortedEvents = newEvents.sorted { $0.startDate < $1.startDate }
+        let eventsForNotifications = Array(sortedEvents.prefix(maxEventsForNotifications))
+        let eventsToSkipNotifications = Set(sortedEvents.dropFirst(maxEventsForNotifications).map { $0.id })
+
+        if sortedEvents.count > maxEventsForNotifications {
+            print("\n⚠️  iOS 64 notification limit: Scheduling notifications for nearest \(maxEventsForNotifications) events only")
+            print("   Total events: \(sortedEvents.count)")
+            print("   Events with notifications: \(maxEventsForNotifications)")
+            print("   Events without notifications: \(sortedEvents.count - maxEventsForNotifications)")
+        }
+
         // Schedule notifications for new or updated events
         print("\n📅 Processing \(newEvents.count) events for notifications:")
-        for (index, event) in newEvents.enumerated() {
-            print("\n[\(index + 1)/\(newEvents.count)]")
+        for (index, event) in sortedEvents.enumerated() {
+            print("\n[\(index + 1)/\(sortedEvents.count)]")
 
             // Cancel existing notifications for this event
             NotificationManager.shared.cancelNotifications(for: event.id)
 
-            // Schedule new notifications
-            NotificationManager.shared.scheduleNotifications(for: event)
+            // Only schedule notifications for the nearest events to stay within iOS limit
+            if eventsToSkipNotifications.contains(event.id) {
+                print("   ⏭️  Skipping notification scheduling (beyond 64 notification iOS limit)")
+            } else {
+                // Schedule new notifications
+                NotificationManager.shared.scheduleNotifications(for: event)
+            }
         }
 
         // Save synced events
