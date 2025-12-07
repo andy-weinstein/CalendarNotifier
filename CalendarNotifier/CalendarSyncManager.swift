@@ -66,8 +66,9 @@ class CalendarSyncManager: ObservableObject {
         }
 
         // iOS has a limit of 64 pending notifications per app
-        // We schedule 2 notifications per event, so limit to 32 events
-        let maxEventsForNotifications = 32
+        // We schedule 2 notifications per event, so limit to 27 events (54 notifications)
+        // This leaves buffer room for other apps that may also need to schedule notifications
+        let maxEventsForNotifications = 27
 
         // Sort events by start date and take the nearest ones for notification scheduling
         let sortedEvents = newEvents.sorted { $0.startDate < $1.startDate }
