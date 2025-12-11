@@ -4,8 +4,12 @@
 <dict>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>fetch</string>
+		<string>processing</string>
 		<string>remote-notification</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.calendarnotifier.refresh</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>

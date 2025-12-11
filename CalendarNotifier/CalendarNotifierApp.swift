@@ -11,9 +11,37 @@ struct CalendarNotifierApp: App {
             ContentView()
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
-            if newPhase == .active {
-                print("\n🟢 APP BECAME ACTIVE - Logging current state")
+            switch newPhase {
+            case .active:
+                print("\n🟢 APP BECAME ACTIVE")
+                print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+                // Sync calendar when app becomes active for fresh data
+                Task {
+                    await CalendarSyncManager.shared.syncCalendar()
+                }
+
+                // Log current state
                 NotificationManager.shared.logPendingNotifications()
+                BackgroundTaskManager.shared.logScheduledTasks()
+
+                print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+
+            case .background:
+                print("\n⚫ APP ENTERED BACKGROUND")
+                print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+                // Schedule next background refresh when app goes to background
+                BackgroundTaskManager.shared.scheduleAppRefresh()
+
+                print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+
+            case .inactive:
+                // Transitional state, no action needed
+                break
+
+            @unknown default:
+                break
             }
         }
     }
@@ -41,18 +69,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-        // Register for background fetch
-        UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
+        // Register modern background tasks (BGTaskScheduler)
+        BackgroundTaskManager.shared.registerBackgroundTasks()
+
+        // Schedule initial background refresh
+        BackgroundTaskManager.shared.scheduleAppRefresh()
 
         return true
-    }
-
-    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        // Sync calendar in background
-        Task {
-            await CalendarSyncManager.shared.syncCalendar()
-            completionHandler(.newData)
-        }
     }
 
     // MARK: - UNUserNotificationCenterDelegate
