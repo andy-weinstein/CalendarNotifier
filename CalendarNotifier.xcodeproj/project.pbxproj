@@ -7,17 +7,66 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16242B332EEB7AEB006133EE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16242B322EEB7AEB006133EE /* WidgetKit.framework */; };
+		16242B352EEB7AEB006133EE /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16242B342EEB7AEB006133EE /* SwiftUI.framework */; };
+		16242B442EEB7AF1006133EE /* CalendarNotifierWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 16242B302EEB7AEB006133EE /* CalendarNotifierWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A6C719B42ECBD02700DCFA00 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A6C719B32ECBD02700DCFA00 /* GoogleSignIn */; };
 		A6C719B62ECBD02700DCFA00 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A6C719B52ECBD02700DCFA00 /* GoogleSignInSwift */; };
 		A6C719BC2ECBD33400DCFA00 /* GoogleAPIClientForREST_Calendar in Frameworks */ = {isa = PBXBuildFile; productRef = A6C719BB2ECBD33400DCFA00 /* GoogleAPIClientForREST_Calendar */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		16242B422EEB7AF1006133EE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A6C7198E2ECBC4AE00DCFA00 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16242B2F2EEB7AEB006133EE;
+			remoteInfo = CalendarNotifierWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		16242B452EEB7AF1006133EE /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				16242B442EEB7AF1006133EE /* CalendarNotifierWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		16242B302EEB7AEB006133EE /* CalendarNotifierWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CalendarNotifierWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		16242B322EEB7AEB006133EE /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		16242B342EEB7AEB006133EE /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		16242B4B2EEB7D17006133EE /* CalendarNotifierWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CalendarNotifierWidgetExtension.entitlements; sourceTree = "<group>"; };
 		A6C719962ECBC4AE00DCFA00 /* CalendarNotifier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalendarNotifier.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6C719B02ECBC62D00DCFA00 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		16242B482EEB7AF1006133EE /* Exceptions for "CalendarNotifierWidget" folder in "CalendarNotifierWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 16242B2F2EEB7AEB006133EE /* CalendarNotifierWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		16242B362EEB7AEB006133EE /* CalendarNotifierWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				16242B482EEB7AF1006133EE /* Exceptions for "CalendarNotifierWidget" folder in "CalendarNotifierWidgetExtension" target */,
+			);
+			path = CalendarNotifierWidget;
+			sourceTree = "<group>";
+		};
 		A6C719982ECBC4AE00DCFA00 /* CalendarNotifier */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = CalendarNotifier;
@@ -26,6 +75,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		16242B2D2EEB7AEB006133EE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16242B352EEB7AEB006133EE /* SwiftUI.framework in Frameworks */,
+				16242B332EEB7AEB006133EE /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A6C719932ECBC4AE00DCFA00 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -39,11 +97,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		16242B312EEB7AEB006133EE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				16242B322EEB7AEB006133EE /* WidgetKit.framework */,
+				16242B342EEB7AEB006133EE /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A6C7198D2ECBC4AE00DCFA00 = {
 			isa = PBXGroup;
 			children = (
+				16242B4B2EEB7D17006133EE /* CalendarNotifierWidgetExtension.entitlements */,
 				A6C719B02ECBC62D00DCFA00 /* Info.plist */,
 				A6C719982ECBC4AE00DCFA00 /* CalendarNotifier */,
+				16242B362EEB7AEB006133EE /* CalendarNotifierWidget */,
+				16242B312EEB7AEB006133EE /* Frameworks */,
 				A6C719972ECBC4AE00DCFA00 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -52,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				A6C719962ECBC4AE00DCFA00 /* CalendarNotifier.app */,
+				16242B302EEB7AEB006133EE /* CalendarNotifierWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -59,6 +130,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		16242B2F2EEB7AEB006133EE /* CalendarNotifierWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 16242B492EEB7AF1006133EE /* Build configuration list for PBXNativeTarget "CalendarNotifierWidgetExtension" */;
+			buildPhases = (
+				16242B2C2EEB7AEB006133EE /* Sources */,
+				16242B2D2EEB7AEB006133EE /* Frameworks */,
+				16242B2E2EEB7AEB006133EE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				16242B362EEB7AEB006133EE /* CalendarNotifierWidget */,
+			);
+			name = CalendarNotifierWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = CalendarNotifierWidgetExtension;
+			productReference = 16242B302EEB7AEB006133EE /* CalendarNotifierWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		A6C719952ECBC4AE00DCFA00 /* CalendarNotifier */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A6C719A12ECBC4B000DCFA00 /* Build configuration list for PBXNativeTarget "CalendarNotifier" */;
@@ -66,10 +159,12 @@
 				A6C719922ECBC4AE00DCFA00 /* Sources */,
 				A6C719932ECBC4AE00DCFA00 /* Frameworks */,
 				A6C719942ECBC4AE00DCFA00 /* Resources */,
+				16242B452EEB7AF1006133EE /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				16242B432EEB7AF1006133EE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A6C719982ECBC4AE00DCFA00 /* CalendarNotifier */,
@@ -94,6 +189,9 @@
 				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					16242B2F2EEB7AEB006133EE = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
 					A6C719952ECBC4AE00DCFA00 = {
 						CreatedOnToolsVersion = 26.1.1;
 						LastSwiftMigration = 2610;
@@ -119,11 +217,19 @@
 			projectRoot = "";
 			targets = (
 				A6C719952ECBC4AE00DCFA00 /* CalendarNotifier */,
+				16242B2F2EEB7AEB006133EE /* CalendarNotifierWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		16242B2E2EEB7AEB006133EE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A6C719942ECBC4AE00DCFA00 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -134,6 +240,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		16242B2C2EEB7AEB006133EE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A6C719922ECBC4AE00DCFA00 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,7 +256,82 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		16242B432EEB7AF1006133EE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16242B2F2EEB7AEB006133EE /* CalendarNotifierWidgetExtension */;
+			targetProxy = 16242B422EEB7AF1006133EE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		16242B462EEB7AF1006133EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CalendarNotifierWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5VDDYYDM7V;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CalendarNotifierWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CalendarNotifierWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.andyweinstein.CalendarNotifier.CalendarNotifierWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		16242B472EEB7AF1006133EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CalendarNotifierWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5VDDYYDM7V;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CalendarNotifierWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CalendarNotifierWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.andyweinstein.CalendarNotifier.CalendarNotifierWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		A6C7199F2ECBC4B000DCFA00 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -266,6 +454,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = CalendarNotifier/CalendarNotifier.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5VDDYYDM7V;
@@ -314,6 +503,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = CalendarNotifier/CalendarNotifier.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5VDDYYDM7V;
@@ -358,6 +548,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		16242B492EEB7AF1006133EE /* Build configuration list for PBXNativeTarget "CalendarNotifierWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16242B462EEB7AF1006133EE /* Debug */,
+				16242B472EEB7AF1006133EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A6C719912ECBC4AE00DCFA00 /* Build configuration list for PBXProject "CalendarNotifier" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
