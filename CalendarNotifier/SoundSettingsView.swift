@@ -62,7 +62,9 @@ class SoundSettingsManager: ObservableObject {
         ("Pack", "Pack"),
         ("Quack", "Quack"),
         ("Rack", "Rack"),
-        ("Sack", "Sack")
+        ("Sack", "Sack"),
+        ("Tack", "Tack"),
+        ("Uack", "Uack")
     ]
 
     private init() {
