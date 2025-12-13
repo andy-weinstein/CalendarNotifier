@@ -1,5 +1,6 @@
 import SwiftUI
 import BackgroundTasks
+import Combine
 
 struct DebugStatusView: View {
     @StateObject private var syncManager = CalendarSyncManager.shared
