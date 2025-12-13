@@ -186,18 +186,24 @@ struct MediumWidgetView: View {
         if let event = event {
             HStack(spacing: 16) {
                 // Large time display
-                VStack(alignment: .center, spacing: 6) {
-                    Text(event.startDate.formatted(.dateTime.weekday(.abbreviated)).uppercased())
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.primary)
-
-                    Text(event.startDate.formatted(.dateTime.day()))
-                        .font(.system(size: 50, weight: .bold))
+                VStack(alignment: .center, spacing: 4) {
+                    // Show Today/Tomorrow or weekday
+                    Text(smartDayText(for: event.startDate))
+                        .font(.system(size: 16, weight: .bold))
                         .foregroundColor(.primary)
                         .minimumScaleFactor(0.8)
 
+                    // Only show day number if NOT today/tomorrow
+                    if !isToday(event.startDate) && !isTomorrow(event.startDate) {
+                        Text(event.startDate.formatted(.dateTime.day()))
+                            .font(.system(size: 40, weight: .bold))
+                            .foregroundColor(.primary)
+                            .minimumScaleFactor(0.8)
+                    }
+
+                    // Larger time display
                     Text(event.startDate, style: .time)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.primary)
                         .minimumScaleFactor(0.8)
                 }
@@ -267,6 +273,24 @@ struct MediumWidgetView: View {
         } else {
             return "in \(minutes)m"
         }
+    }
+
+    private func smartDayText(for date: Date) -> String {
+        if isToday(date) {
+            return "TODAY"
+        } else if isTomorrow(date) {
+            return "TOMORROW"
+        } else {
+            return date.formatted(.dateTime.weekday(.abbreviated)).uppercased()
+        }
+    }
+
+    private func isToday(_ date: Date) -> Bool {
+        Calendar.current.isDateInToday(date)
+    }
+
+    private func isTomorrow(_ date: Date) -> Bool {
+        Calendar.current.isDateInTomorrow(date)
     }
 }
 

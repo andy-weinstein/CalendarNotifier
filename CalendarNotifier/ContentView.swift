@@ -142,17 +142,19 @@ struct ContentView: View {
                     .tracking(2.0)
 
                 VStack(spacing: isBigger ? 16 : 12) {
-                    // Day of week - larger
-                    Text(event.startDate.formatted(.dateTime.weekday(.wide)))
-                        .font(isBigger ? .system(size: 36, weight: .light) : .system(size: 28, weight: .light))
-                        .minimumScaleFactor(0.7)
-
-                    // Date - much larger
-                    Text(event.startDate.formatted(.dateTime.month(.wide).day()))
+                    // Smart day display - Today/Tomorrow or day of week
+                    Text(smartDayText(for: event.startDate))
                         .font(isBigger ? .system(size: 44, weight: .bold) : .system(size: 36, weight: .bold))
                         .minimumScaleFactor(0.7)
 
-                    // Time - extra large and high contrast
+                    // Date - only show if NOT today or tomorrow
+                    if !isToday(event.startDate) && !isTomorrow(event.startDate) {
+                        Text(event.startDate.formatted(.dateTime.month(.wide).day()))
+                            .font(isBigger ? .system(size: 36, weight: .bold) : .system(size: 28, weight: .bold))
+                            .minimumScaleFactor(0.7)
+                    }
+
+                    // Time - respects user's locale (12h/24h)
                     Text(event.startDate.formatted(.dateTime.hour().minute()))
                         .font(isBigger ? .system(size: 64, weight: .bold) : .system(size: 52, weight: .bold))
                         .foregroundColor(.primary)
@@ -160,10 +162,10 @@ struct ContentView: View {
                         .accessibilityLabel("Event time: \(event.startDate.formatted(.dateTime.hour().minute()))")
                 }
 
-                // Event details - larger and clearer
+                // Event details - larger title
                 VStack(spacing: isBigger ? 12 : 8) {
                     Text(event.title)
-                        .font(isBigger ? .system(size: 28, weight: .semibold) : .system(size: 24, weight: .semibold))
+                        .font(isBigger ? .system(size: 32, weight: .bold) : .system(size: 28, weight: .bold))
                         .multilineTextAlignment(.center)
                         .minimumScaleFactor(0.85)
 
@@ -199,6 +201,26 @@ struct ContentView: View {
             }
         }
         .padding(.horizontal, isBigger ? 24 : 20)
+    }
+
+    // MARK: - Helper Functions
+
+    private func smartDayText(for date: Date) -> String {
+        if isToday(date) {
+            return "Today"
+        } else if isTomorrow(date) {
+            return "Tomorrow"
+        } else {
+            return date.formatted(.dateTime.weekday(.wide))
+        }
+    }
+
+    private func isToday(_ date: Date) -> Bool {
+        Calendar.current.isDateInToday(date)
+    }
+
+    private func isTomorrow(_ date: Date) -> Bool {
+        Calendar.current.isDateInTomorrow(date)
     }
 
     // MARK: - Unauthenticated View
