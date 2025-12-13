@@ -187,7 +187,7 @@ struct MediumWidgetView: View {
             HStack(spacing: 16) {
                 // Large time display
                 VStack(alignment: .center, spacing: 6) {
-                    Text(event.startDate.formatted(.dateTime.weekday(.abbreviated).uppercased()))
+                    Text(event.startDate.formatted(.dateTime.weekday(.abbreviated)).uppercased())
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.primary)
 
