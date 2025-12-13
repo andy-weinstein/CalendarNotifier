@@ -45,13 +45,12 @@ struct CalendarTimelineProvider: TimelineProvider {
 
         print("📊 Widget Timeline: Loading timeline with \(allEvents.count) events")
 
-        let nextSharedEvent = allEvents
+        let futureEvents = allEvents
             .filter { $0.startDate > currentDate }
             .sorted { $0.startDate < $1.startDate }
-            .first
 
-        // Convert SharedCalendarEvent to WidgetEvent
-        let nextEvent = nextSharedEvent.map { event in
+        // Convert first event to WidgetEvent
+        let nextEvent = futureEvents.first.map { event in
             WidgetEvent(
                 id: event.id,
                 title: event.title,
@@ -66,29 +65,26 @@ struct CalendarTimelineProvider: TimelineProvider {
         entries.append(CalendarEntry(date: currentDate, event: nextEvent))
         print("✅ Widget Timeline: Entry 1 - Now with event: \(nextEvent?.title ?? "nil")")
 
-        // If there's an event, create entry for when it starts to show the NEXT event
-        if let currentSharedEvent = nextSharedEvent {
-            if currentSharedEvent.startDate > currentDate {
-                // Find the event AFTER the current one
-                let eventAfterCurrent = allEvents
-                    .filter { $0.startDate > currentSharedEvent.startDate }
-                    .sorted { $0.startDate < $1.startDate }
-                    .first
+        // Create entries for each future event transition
+        // When event N starts, show event N+1 (or nil if no more events)
+        for (index, event) in futureEvents.enumerated() {
+            if event.startDate > currentDate {
+                let nextEventAfterCurrent = futureEvents.dropFirst(index + 1).first
 
-                let nextEntry = eventAfterCurrent.map { event in
+                let nextEntry = nextEventAfterCurrent.map { evt in
                     WidgetEvent(
-                        id: event.id,
-                        title: event.title,
-                        startDate: event.startDate,
-                        location: event.location
+                        id: evt.id,
+                        title: evt.title,
+                        startDate: evt.startDate,
+                        location: evt.location
                     )
                 }
 
                 entries.append(CalendarEntry(
-                    date: currentSharedEvent.startDate,
+                    date: event.startDate,
                     event: nextEntry
                 ))
-                print("✅ Widget Timeline: Entry 2 - At \(currentSharedEvent.startDate) with event: \(eventAfterCurrent?.title ?? "nil")")
+                print("✅ Widget Timeline: Entry \(index + 2) - At \(event.startDate) with event: \(nextEventAfterCurrent?.title ?? "nil")")
             }
         }
 
