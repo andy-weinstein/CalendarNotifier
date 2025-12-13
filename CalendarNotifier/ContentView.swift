@@ -55,13 +55,13 @@ struct ContentView: View {
 
     private var authenticatedView: some View {
         VStack(spacing: 0) {
-            // Next Event Section
+            // Next Event Section - now with more space
             nextEventSection
-                .padding(.top, isBigger ? 30 : 20)
+                .padding(.top, isBigger ? 40 : 30)
 
             Spacer()
 
-            // Sync Status
+            // Sync Status (subtle, at bottom)
             if syncManager.isSyncing {
                 HStack(spacing: isBigger ? 12 : 8) {
                     ProgressView()
@@ -70,63 +70,42 @@ struct ContentView: View {
                         .font(isBigger ? .body : .caption)
                         .foregroundColor(.secondary)
                 }
-                .padding(.bottom, isBigger ? 12 : 8)
-            } else if let count = syncManager.lastSyncCount {
-                Text("\(count) event\(count == 1 ? "" : "s") synced")
-                    .font(isBigger ? .body : .caption)
-                    .foregroundColor(.green)
-                    .padding(.bottom, isBigger ? 12 : 8)
+                .padding(.bottom, isBigger ? 16 : 12)
             }
 
-            // Action Buttons
-            VStack(spacing: buttonSpacing) {
-                Button {
-                    Task {
-                        await syncManager.syncCalendar()
-                    }
-                } label: {
-                    HStack {
-                        Image(systemName: "arrow.clockwise")
-                            .font(isBigger ? .title3 : .body)
-                        Text("Sync Now")
-                            .font(isBigger ? .title3 : .body)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, isBigger ? 8 : 0)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(syncManager.isSyncing)
-
-                Button {
-                    showingEventList = true
-                } label: {
-                    HStack {
-                        Image(systemName: "list.bullet.rectangle")
-                            .font(isBigger ? .title3 : .body)
-                        Text("Show My Day")
-                            .font(isBigger ? .title3 : .body)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, isBigger ? 8 : 0)
-                }
-                .buttonStyle(.bordered)
-
+            // Action Buttons - Side by side
+            HStack(spacing: isBigger ? 20 : 16) {
+                // Settings button - gear icon only
                 Button {
                     showingSettings = true
                 } label: {
-                    HStack {
-                        Image(systemName: "gearshape")
-                            .font(isBigger ? .title3 : .body)
-                        Text("Settings")
-                            .font(isBigger ? .title3 : .body)
+                    Image(systemName: "gearshape.fill")
+                        .font(isBigger ? .system(size: 32) : .system(size: 28))
+                        .foregroundColor(.blue)
+                        .frame(width: isBigger ? 70 : 60, height: isBigger ? 70 : 60)
+                        .background(Color.blue.opacity(0.1))
+                        .clipShape(Circle())
+                }
+                .accessibilityLabel("Settings")
+
+                // Show My Day button
+                Button {
+                    showingEventList = true
+                } label: {
+                    HStack(spacing: isBigger ? 12 : 10) {
+                        Image(systemName: "list.bullet.rectangle")
+                            .font(isBigger ? .title2 : .title3)
+                        Text("Show My Day")
+                            .font(isBigger ? .title2 : .title3)
+                            .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, isBigger ? 8 : 0)
+                    .padding(.vertical, isBigger ? 18 : 16)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
             }
-            .padding(.horizontal, buttonPadding)
-            .padding(.bottom, isBigger ? 40 : 30)
+            .padding(.horizontal, isBigger ? 30 : 24)
+            .padding(.bottom, isBigger ? 50 : 40)
         }
         .navigationTitle("Calendar Notifier")
         .navigationBarTitleDisplayMode(.inline)
@@ -144,70 +123,69 @@ struct ContentView: View {
         VStack(spacing: sectionSpacing) {
             if let event = syncManager.nextEvent {
                 Text("NEXT EVENT")
-                    .font(isBigger ? .body : .caption)
-                    .fontWeight(.semibold)
+                    .font(isBigger ? .title3 : .body)
+                    .fontWeight(.bold)
                     .foregroundColor(.secondary)
-                    .tracking(1.5)
+                    .tracking(2.0)
 
-                VStack(spacing: isBigger ? 12 : 8) {
-                    // Day of week
+                VStack(spacing: isBigger ? 16 : 12) {
+                    // Day of week - larger
                     Text(event.startDate.formatted(.dateTime.weekday(.wide)))
-                        .font(isBigger ? .title.weight(.light) : .title2.weight(.light))
+                        .font(isBigger ? .system(size: 36, weight: .light) : .system(size: 28, weight: .light))
                         .minimumScaleFactor(0.7)
 
-                    // Date
+                    // Date - much larger
                     Text(event.startDate.formatted(.dateTime.month(.wide).day()))
-                        .font(isBigger ? .largeTitle.weight(.bold) : .title.weight(.bold))
+                        .font(isBigger ? .system(size: 44, weight: .bold) : .system(size: 36, weight: .bold))
                         .minimumScaleFactor(0.7)
 
-                    // Time
+                    // Time - extra large and high contrast
                     Text(event.startDate.formatted(.dateTime.hour().minute()))
-                        .font(isBigger ? .system(size: 48, weight: .bold) : .largeTitle.weight(.bold))
-                        .foregroundColor(.blue)
+                        .font(isBigger ? .system(size: 64, weight: .bold) : .system(size: 52, weight: .bold))
+                        .foregroundColor(.primary)
                         .minimumScaleFactor(0.7)
                         .accessibilityLabel("Event time: \(event.startDate.formatted(.dateTime.hour().minute()))")
                 }
 
-                // Event details
-                VStack(spacing: isBigger ? 8 : 4) {
+                // Event details - larger and clearer
+                VStack(spacing: isBigger ? 12 : 8) {
                     Text(event.title)
-                        .font(isBigger ? .title2 : .title3)
-                        .fontWeight(.medium)
+                        .font(isBigger ? .system(size: 28, weight: .semibold) : .system(size: 24, weight: .semibold))
                         .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.85)
 
                     if let location = event.location, !location.isEmpty {
-                        HStack(spacing: isBigger ? 6 : 4) {
-                            Image(systemName: "mappin")
-                                .font(isBigger ? .body : .caption)
+                        HStack(spacing: isBigger ? 8 : 6) {
+                            Image(systemName: "mappin.circle.fill")
+                                .font(isBigger ? .title2 : .title3)
                             Text(location)
-                                .font(isBigger ? .body : .subheadline)
+                                .font(isBigger ? .title3 : .body)
                         }
                         .foregroundColor(.secondary)
                     }
                 }
-                .padding(.top, isBigger ? 12 : 8)
+                .padding(.top, isBigger ? 20 : 16)
 
             } else {
-                VStack(spacing: isBigger ? 16 : 12) {
+                VStack(spacing: isBigger ? 20 : 16) {
                     Image(systemName: "calendar")
-                        .font(isBigger ? .system(size: 48) : .largeTitle)
+                        .font(isBigger ? .system(size: 60) : .system(size: 50))
                         .foregroundColor(.secondary)
                         .accessibilityHidden(true)
 
                     Text("No Upcoming Events")
-                        .font(isBigger ? .title : .title2)
-                        .fontWeight(.medium)
+                        .font(isBigger ? .system(size: 32, weight: .bold) : .system(size: 28, weight: .bold))
 
-                    Text("Tap Sync Now to refresh your calendar")
-                        .font(isBigger ? .body : .subheadline)
+                    Text("Open Settings to sync your calendar")
+                        .font(isBigger ? .title3 : .body)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                 }
-                .padding(.top, isBigger ? 50 : 40)
+                .padding(.top, isBigger ? 60 : 50)
                 .accessibilityElement(children: .combine)
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, isBigger ? 24 : 20)
     }
 
     // MARK: - Unauthenticated View

@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var calendarManager = GoogleCalendarManager.shared
+    @StateObject private var syncManager = CalendarSyncManager.shared
     @StateObject private var soundSettings = SoundSettingsManager.shared
     @State private var showingSoundSettings = false
 
@@ -11,6 +12,43 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             List {
+                // Sync Section
+                Section {
+                    Button {
+                        Task {
+                            await syncManager.syncCalendar()
+                        }
+                    } label: {
+                        HStack {
+                            if syncManager.isSyncing {
+                                ProgressView()
+                                    .frame(width: isBigger ? 28 : 24)
+                            } else {
+                                Image(systemName: "arrow.clockwise")
+                                    .foregroundColor(.blue)
+                                    .frame(width: isBigger ? 28 : 24)
+                                    .font(isBigger ? .title3 : .body)
+                            }
+                            Text("Sync Now")
+                                .font(isBigger ? .body : .body)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            if let count = syncManager.lastSyncCount {
+                                Text("\(count) event\(count == 1 ? "" : "s")")
+                                    .font(isBigger ? .body : .callout)
+                                    .foregroundColor(.green)
+                            }
+                        }
+                    }
+                    .disabled(syncManager.isSyncing)
+                } header: {
+                    Text("Calendar Sync")
+                        .font(isBigger ? .subheadline : .footnote)
+                } footer: {
+                    Text("Manually sync your Google Calendar events")
+                        .font(isBigger ? .subheadline : .footnote)
+                }
+
                 // Accessibility Section
                 Section {
                     Toggle(isOn: $soundSettings.biggerMode) {

@@ -120,47 +120,45 @@ struct SmallWidgetView: View {
 
     var body: some View {
         if let event = event {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("NEXT")
-                    .font(.caption2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.secondary)
-
+            VStack(alignment: .center, spacing: 8) {
+                // Large, high-contrast time
                 Text(event.startDate, style: .time)
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(.blue)
+                    .font(.system(size: 40, weight: .bold))
+                    .foregroundColor(.primary)
+                    .minimumScaleFactor(0.8)
 
+                // Event title - larger and bolder
                 Text(event.title)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .lineLimit(2)
-
-                if let location = event.location, !location.isEmpty {
-                    Text(location)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                }
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
+                    .lineLimit(3)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.85)
 
                 Spacer()
 
+                // Time until - larger and high contrast
                 Text(timeUntilEvent(event.startDate))
-                    .font(.caption2)
-                    .foregroundColor(.orange)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.orange)
+                    .cornerRadius(8)
             }
-            .padding()
-            .containerBackground(.fill.tertiary, for: .widget)
+            .padding(12)
+            .containerBackground(.fill, for: .widget)
         } else {
-            VStack(spacing: 8) {
+            VStack(spacing: 12) {
                 Image(systemName: "calendar")
-                    .font(.title)
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 44))
+                    .foregroundColor(.primary)
 
                 Text("No Events")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
             }
-            .containerBackground(.fill.tertiary, for: .widget)
+            .containerBackground(.fill, for: .widget)
         }
     }
 
@@ -187,74 +185,71 @@ struct MediumWidgetView: View {
     var body: some View {
         if let event = event {
             HStack(spacing: 16) {
-                // Time column
-                VStack(alignment: .center, spacing: 4) {
-                    Text(event.startDate.formatted(.dateTime.weekday(.abbreviated)))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                // Large time display
+                VStack(alignment: .center, spacing: 6) {
+                    Text(event.startDate.formatted(.dateTime.weekday(.abbreviated).uppercased()))
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.primary)
 
                     Text(event.startDate.formatted(.dateTime.day()))
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .font(.system(size: 50, weight: .bold))
+                        .foregroundColor(.primary)
+                        .minimumScaleFactor(0.8)
 
                     Text(event.startDate, style: .time)
-                        .font(.caption)
-                        .foregroundColor(.blue)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.primary)
+                        .minimumScaleFactor(0.8)
                 }
-                .frame(width: 60)
+                .frame(width: 90)
 
-                // Event details
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("NEXT EVENT")
-                        .font(.caption2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
-
+                // Event details - larger and clearer
+                VStack(alignment: .leading, spacing: 8) {
                     Text(event.title)
-                        .font(.headline)
-                        .lineLimit(2)
-
-                    if let location = event.location, !location.isEmpty {
-                        HStack(spacing: 2) {
-                            Image(systemName: "mappin")
-                                .font(.caption2)
-                            Text(location)
-                                .font(.caption)
-                        }
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                    }
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.primary)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.85)
 
                     Spacer()
 
-                    Text(timeUntilEvent(event.startDate))
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundColor(.orange)
+                    // Time until - high contrast badge
+                    HStack {
+                        Text(timeUntilEvent(event.startDate))
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(Color.orange)
+                            .cornerRadius(10)
+
+                        Spacer()
+                    }
                 }
 
-                Spacer()
+                Spacer(minLength: 4)
             }
-            .padding()
-            .containerBackground(.fill.tertiary, for: .widget)
+            .padding(14)
+            .containerBackground(.fill, for: .widget)
         } else {
-            HStack {
+            HStack(spacing: 16) {
                 Image(systemName: "calendar")
-                    .font(.largeTitle)
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 50))
+                    .foregroundColor(.primary)
 
-                VStack(alignment: .leading) {
-                    Text("No Upcoming Events")
-                        .font(.headline)
-                    Text("Open app to sync calendar")
-                        .font(.caption)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("No Events")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.primary)
+                    Text("Open app to sync")
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.secondary)
                 }
 
                 Spacer()
             }
-            .padding()
-            .containerBackground(.fill.tertiary, for: .widget)
+            .padding(14)
+            .containerBackground(.fill, for: .widget)
         }
     }
 
