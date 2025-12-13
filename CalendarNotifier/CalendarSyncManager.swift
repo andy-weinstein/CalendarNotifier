@@ -48,13 +48,20 @@ class CalendarSyncManager: ObservableObject {
         print("\n🔄 STARTING EVENT SYNC")
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
+        // Filter to only FUTURE events
+        let now = Date()
+        let futureEvents = newEvents.filter { $0.startDate > now }
+
+        print("📊 Total events from Google: \(newEvents.count)")
+        print("📊 Future events: \(futureEvents.count)")
+
         // Get previously synced events
         let previousEvents = loadSyncedEvents()
         let previousEventIDs = Set(previousEvents.map { $0.id })
-        let newEventIDs = Set(newEvents.map { $0.id })
+        let newEventIDs = Set(futureEvents.map { $0.id })
 
-        print("📊 Previous events: \(previousEvents.count)")
-        print("📊 New events: \(newEvents.count)")
+        print("📊 Previous synced events: \(previousEvents.count)")
+        print("📊 New synced events: \(futureEvents.count)")
 
         // Cancel notifications for removed events
         let removedEventIDs = previousEventIDs.subtracting(newEventIDs)
@@ -71,7 +78,7 @@ class CalendarSyncManager: ObservableObject {
         let maxEventsForNotifications = 27
 
         // Sort events by start date and take the nearest ones for notification scheduling
-        let sortedEvents = newEvents.sorted { $0.startDate < $1.startDate }
+        let sortedEvents = futureEvents.sorted { $0.startDate < $1.startDate }
         let eventsForNotifications = Array(sortedEvents.prefix(maxEventsForNotifications))
         let eventsToSkipNotifications = Set(sortedEvents.dropFirst(maxEventsForNotifications).map { $0.id })
 
@@ -83,7 +90,7 @@ class CalendarSyncManager: ObservableObject {
         }
 
         // Schedule notifications for new or updated events
-        print("\n📅 Processing \(newEvents.count) events for notifications:")
+        print("\n📅 Processing \(futureEvents.count) events for notifications:")
         for (index, event) in sortedEvents.enumerated() {
             print("\n[\(index + 1)/\(sortedEvents.count)]")
 
@@ -99,10 +106,10 @@ class CalendarSyncManager: ObservableObject {
             }
         }
 
-        // Save synced events
-        saveSyncedEvents(newEvents)
+        // Save synced events (only future events)
+        saveSyncedEvents(futureEvents)
 
-        print("\n✅ Sync complete - processed \(newEvents.count) events")
+        print("\n✅ Sync complete - processed \(futureEvents.count) future events")
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
         // Log all pending notifications after sync
@@ -110,8 +117,8 @@ class CalendarSyncManager: ObservableObject {
 
         // Update published events on main thread
         DispatchQueue.main.async {
-            self.events = newEvents
-            self.lastSyncCount = newEvents.count
+            self.events = futureEvents
+            self.lastSyncCount = futureEvents.count
 
             // Haptic feedback on successful sync
             let generator = UINotificationFeedbackGenerator()
