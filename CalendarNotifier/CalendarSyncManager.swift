@@ -140,15 +140,34 @@ class CalendarSyncManager: ObservableObject {
     }
     
     private func saveSyncedEvents(_ events: [CalendarEvent]) {
+        print("\n📲 SAVING EVENTS TO WIDGET")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print("📊 Saving \(events.count) events to shared UserDefaults")
+        for (index, event) in events.enumerated() {
+            print("   [\(index + 1)] '\(event.title)' at \(event.startDate)")
+        }
+
         if let data = try? JSONEncoder().encode(events) {
+            print("📦 Encoded \(data.count) bytes of event data")
+
             // Save to standard UserDefaults
             userDefaults.set(data, forKey: syncedEventsKey)
+            print("✅ Saved to standard UserDefaults")
 
             // Save to shared App Group for widget access
-            sharedDefaults?.set(data, forKey: syncedEventsKey)
+            if let sharedDefaults = sharedDefaults {
+                sharedDefaults.set(data, forKey: syncedEventsKey)
+                print("✅ Saved to App Group: group.com.calendarnotifier.shared")
+            } else {
+                print("❌ Failed to save to App Group - sharedDefaults is nil")
+            }
 
             // Tell widget to refresh
             WidgetCenter.shared.reloadAllTimelines()
+            print("🔄 Widget reload requested via WidgetCenter.shared.reloadAllTimelines()")
+        } else {
+            print("❌ Failed to encode events to JSON")
         }
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
     }
 }
