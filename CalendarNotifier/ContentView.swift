@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var showingAuth = false
     @State private var showingSettings = false
     @State private var showingEventList = false
+    @State private var currentTime = Date()
 
     // Computed properties for bigger mode
     private var isBigger: Bool { soundSettings.biggerMode }
@@ -62,15 +63,27 @@ struct ContentView: View {
             Spacer()
 
             // Sync Status (subtle, at bottom)
-            if syncManager.isSyncing {
-                HStack(spacing: isBigger ? 12 : 8) {
-                    ProgressView()
-                        .scaleEffect(isBigger ? 1.2 : 1.0)
-                    Text("Syncing...")
-                        .font(isBigger ? .body : .caption)
+            VStack(spacing: 4) {
+                if syncManager.isSyncing {
+                    HStack(spacing: isBigger ? 12 : 8) {
+                        ProgressView()
+                            .scaleEffect(isBigger ? 1.2 : 1.0)
+                        Text("Syncing...")
+                            .font(isBigger ? .body : .caption)
+                            .foregroundColor(.secondary)
+                    }
+                } else if let lastSync = calendarManager.lastSyncDate {
+                    Text("Last synced \(lastSync.formatted(.relative(presentation: .named)))")
+                        .font(isBigger ? .caption : .caption2)
                         .foregroundColor(.secondary)
                 }
-                .padding(.bottom, isBigger ? 16 : 12)
+            }
+            .padding(.bottom, isBigger ? 16 : 12)
+            .onAppear {
+                // Refresh time every minute to update relative time
+                Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+                    currentTime = Date()
+                }
             }
 
             // Action Buttons - Side by side

@@ -6,6 +6,7 @@ struct SettingsView: View {
     @StateObject private var syncManager = CalendarSyncManager.shared
     @StateObject private var soundSettings = SoundSettingsManager.shared
     @State private var showingSoundSettings = false
+    @State private var showingDebugStatus = false
 
     private var isBigger: Bool { soundSettings.biggerMode }
 
@@ -218,6 +219,24 @@ struct SettingsView: View {
                             .font(isBigger ? .body : .body)
                             .foregroundColor(.secondary)
                     }
+
+                    Button {
+                        showingDebugStatus = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "ladybug")
+                                .foregroundColor(.purple)
+                                .frame(width: isBigger ? 28 : 24)
+                                .font(isBigger ? .title3 : .body)
+                            Text("Debug Status")
+                                .font(isBigger ? .body : .body)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(isBigger ? .body : .caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 } header: {
                     Text("About")
                         .font(isBigger ? .subheadline : .footnote)
@@ -234,6 +253,9 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showingSoundSettings) {
                 SoundSettingsView()
+            }
+            .sheet(isPresented: $showingDebugStatus) {
+                DebugStatusView()
             }
         }
     }
