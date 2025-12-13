@@ -40,64 +40,99 @@ struct CalendarTimelineProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<CalendarEntry>) -> Void) {
         // Load events and trigger sync
-        let nextEvent = loadNextEvent()
-
+        let allEvents = loadAllEvents()
         let currentDate = Date()
+
+        print("📊 Widget Timeline: Loading timeline with \(allEvents.count) events")
+
+        let nextEvent = allEvents
+            .filter { $0.startDate > currentDate }
+            .sorted { $0.startDate < $1.startDate }
+            .first
+
         var entries: [CalendarEntry] = []
 
         // Create entry for now
         entries.append(CalendarEntry(date: currentDate, event: nextEvent))
+        print("✅ Widget Timeline: Entry 1 - Now with event: \(nextEvent?.title ?? "nil")")
 
-        // If there's an event, create entries for key times
-        if let event = nextEvent {
-            // Entry when event starts (to show next event after this one)
-            if event.startDate > currentDate {
-                entries.append(CalendarEntry(date: event.startDate, event: nil))
+        // If there's an event, create entry for when it starts to show the NEXT event
+        if let currentEvent = nextEvent {
+            if currentEvent.startDate > currentDate {
+                // Find the event AFTER the current one
+                let eventAfterCurrent = allEvents
+                    .filter { $0.startDate > currentEvent.startDate }
+                    .sorted { $0.startDate < $1.startDate }
+                    .first
+
+                let nextEntry = WidgetEvent(
+                    id: eventAfterCurrent?.id ?? "",
+                    title: eventAfterCurrent?.title ?? "",
+                    startDate: eventAfterCurrent?.startDate ?? Date.distantFuture,
+                    location: eventAfterCurrent?.location
+                )
+
+                entries.append(CalendarEntry(
+                    date: currentEvent.startDate,
+                    event: eventAfterCurrent != nil ? nextEntry : nil
+                ))
+                print("✅ Widget Timeline: Entry 2 - At \(currentEvent.startDate) with event: \(eventAfterCurrent?.title ?? "nil")")
             }
         }
 
         // Request refresh every 15 minutes for sync
         let refreshDate = Calendar.current.date(byAdding: .minute, value: 15, to: currentDate) ?? currentDate.addingTimeInterval(900)
+        print("✅ Widget Timeline: Next refresh at \(refreshDate)")
 
         let timeline = Timeline(entries: entries, policy: .after(refreshDate))
         completion(timeline)
     }
 
-    private func loadNextEvent() -> WidgetEvent? {
-        // Load from shared App Group UserDefaults
+    private func loadAllEvents() -> [SharedCalendarEvent] {
+        print("📊 Widget loadAllEvents: Starting to load events")
+
         guard let sharedDefaults = UserDefaults(suiteName: "group.com.calendarnotifier.shared") else {
-            print("⚠️ Widget: Failed to load shared UserDefaults")
-            return nil
+            print("⚠️ Widget loadAllEvents: Failed to load shared UserDefaults")
+            return []
         }
 
         guard let data = sharedDefaults.data(forKey: "syncedEvents") else {
-            print("⚠️ Widget: No data found for syncedEvents")
-            return nil
+            print("⚠️ Widget loadAllEvents: No data found for syncedEvents")
+            return []
         }
 
-        print("📊 Widget: Found \(data.count) bytes of event data")
+        print("📊 Widget loadAllEvents: Found \(data.count) bytes of event data")
 
         guard let events = try? JSONDecoder().decode([SharedCalendarEvent].self, from: data) else {
-            print("❌ Widget: Failed to decode events from data")
-            return nil
+            print("❌ Widget loadAllEvents: Failed to decode events from data")
+            return []
         }
 
-        print("📊 Widget: Decoded \(events.count) total events")
+        print("📊 Widget loadAllEvents: Decoded \(events.count) total events")
+        for (index, event) in events.enumerated() {
+            print("   Event \(index + 1): '\(event.title)' at \(event.startDate)")
+        }
 
+        return events
+    }
+
+    private func loadNextEvent() -> WidgetEvent? {
+        let allEvents = loadAllEvents()
         let now = Date()
-        let futureEvents = events.filter { $0.startDate > now }
-        print("📊 Widget: Found \(futureEvents.count) future events")
+        let futureEvents = allEvents.filter { $0.startDate > now }
+
+        print("📊 Widget loadNextEvent: Found \(futureEvents.count) future events out of \(allEvents.count) total")
 
         let nextEvent = futureEvents
             .sorted { $0.startDate < $1.startDate }
             .first
 
         guard let event = nextEvent else {
-            print("⚠️ Widget: No future events to display")
+            print("⚠️ Widget loadNextEvent: No future events to display")
             return nil
         }
 
-        print("✅ Widget: Displaying event '\(event.title)' at \(event.startDate)")
+        print("✅ Widget loadNextEvent: Returning event '\(event.title)' at \(event.startDate)")
 
         return WidgetEvent(
             id: event.id,
@@ -140,7 +175,7 @@ struct SmallWidgetView: View {
 
     var body: some View {
         if let event = event {
-            VStack(alignment: .center, spacing: 6) {
+            VStack(alignment: .center, spacing: 8) {
                 // Large, high-contrast time
                 Text(event.startDate, style: .time)
                     .font(.system(size: 40, weight: .bold))
@@ -151,19 +186,10 @@ struct SmallWidgetView: View {
                 Text(event.title)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.primary)
-                    .lineLimit(5)
+                    .lineLimit(6)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: false)
                     .frame(maxHeight: .infinity)
-
-                // Time until - at bottom
-                Text(timeUntilEvent(event.startDate))
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.orange)
-                    .cornerRadius(8)
             }
             .padding(12)
             .containerBackground(.fill, for: .widget)
@@ -178,22 +204,6 @@ struct SmallWidgetView: View {
                     .foregroundColor(.primary)
             }
             .containerBackground(.fill, for: .widget)
-        }
-    }
-
-    private func timeUntilEvent(_ date: Date) -> String {
-        let interval = date.timeIntervalSince(Date())
-        if interval < 0 {
-            return "Now"
-        }
-
-        let hours = Int(interval) / 3600
-        let minutes = (Int(interval) % 3600) / 60
-
-        if hours > 0 {
-            return "in \(hours)h \(minutes)m"
-        } else {
-            return "in \(minutes)m"
         }
     }
 }
@@ -229,25 +239,25 @@ struct MediumWidgetView: View {
                 .frame(width: 90)
 
                 // Event details - wraps to fill available space
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(event.title)
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.primary)
-                        .lineLimit(6)
+                        .lineLimit(7)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: false)
                         .frame(maxHeight: .infinity, alignment: .top)
 
-                    Spacer(minLength: 4)
-
-                    // Time until - at bottom
-                    Text(timeUntilEvent(event.startDate))
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Color.orange)
-                        .cornerRadius(10)
+                    if let location = event.location, !location.isEmpty {
+                        HStack(spacing: 4) {
+                            Image(systemName: "mappin.circle.fill")
+                                .font(.system(size: 14))
+                            Text(location)
+                                .font(.system(size: 14, weight: .medium))
+                        }
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                    }
                 }
 
                 Spacer(minLength: 4)
@@ -273,22 +283,6 @@ struct MediumWidgetView: View {
             }
             .padding(14)
             .containerBackground(.fill, for: .widget)
-        }
-    }
-
-    private func timeUntilEvent(_ date: Date) -> String {
-        let interval = date.timeIntervalSince(Date())
-        if interval < 0 {
-            return "Now"
-        }
-
-        let hours = Int(interval) / 3600
-        let minutes = (Int(interval) % 3600) / 60
-
-        if hours > 0 {
-            return "in \(hours)h \(minutes)m"
-        } else {
-            return "in \(minutes)m"
         }
     }
 
