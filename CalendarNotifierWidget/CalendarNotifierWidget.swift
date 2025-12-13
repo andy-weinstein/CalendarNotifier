@@ -120,24 +120,23 @@ struct SmallWidgetView: View {
 
     var body: some View {
         if let event = event {
-            VStack(alignment: .center, spacing: 8) {
+            VStack(alignment: .center, spacing: 6) {
                 // Large, high-contrast time
                 Text(event.startDate, style: .time)
                     .font(.system(size: 40, weight: .bold))
                     .foregroundColor(.primary)
                     .minimumScaleFactor(0.8)
 
-                // Event title - larger and bolder
+                // Event title - wraps to fill available space
                 Text(event.title)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.primary)
-                    .lineLimit(3)
+                    .lineLimit(5)
                     .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.85)
+                    .fixedSize(horizontal: false, vertical: false)
+                    .frame(maxHeight: .infinity)
 
-                Spacer()
-
-                // Time until - larger and high contrast
+                // Time until - at bottom
                 Text(timeUntilEvent(event.startDate))
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
@@ -209,28 +208,26 @@ struct MediumWidgetView: View {
                 }
                 .frame(width: 90)
 
-                // Event details - larger and clearer
-                VStack(alignment: .leading, spacing: 8) {
+                // Event details - wraps to fill available space
+                VStack(alignment: .leading, spacing: 4) {
                     Text(event.title)
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.primary)
-                        .lineLimit(3)
-                        .minimumScaleFactor(0.85)
+                        .lineLimit(6)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: false)
+                        .frame(maxHeight: .infinity, alignment: .top)
 
-                    Spacer()
+                    Spacer(minLength: 4)
 
-                    // Time until - high contrast badge
-                    HStack {
-                        Text(timeUntilEvent(event.startDate))
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(Color.orange)
-                            .cornerRadius(10)
-
-                        Spacer()
-                    }
+                    // Time until - at bottom
+                    Text(timeUntilEvent(event.startDate))
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(Color.orange)
+                        .cornerRadius(10)
                 }
 
                 Spacer(minLength: 4)
