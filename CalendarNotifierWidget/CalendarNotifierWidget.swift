@@ -65,19 +65,39 @@ struct CalendarTimelineProvider: TimelineProvider {
 
     private func loadNextEvent() -> WidgetEvent? {
         // Load from shared App Group UserDefaults
-        guard let sharedDefaults = UserDefaults(suiteName: "group.com.calendarnotifier.shared"),
-              let data = sharedDefaults.data(forKey: "syncedEvents"),
-              let events = try? JSONDecoder().decode([SharedCalendarEvent].self, from: data) else {
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.calendarnotifier.shared") else {
+            print("⚠️ Widget: Failed to load shared UserDefaults")
             return nil
         }
 
+        guard let data = sharedDefaults.data(forKey: "syncedEvents") else {
+            print("⚠️ Widget: No data found for syncedEvents")
+            return nil
+        }
+
+        print("📊 Widget: Found \(data.count) bytes of event data")
+
+        guard let events = try? JSONDecoder().decode([SharedCalendarEvent].self, from: data) else {
+            print("❌ Widget: Failed to decode events from data")
+            return nil
+        }
+
+        print("📊 Widget: Decoded \(events.count) total events")
+
         let now = Date()
-        let nextEvent = events
-            .filter { $0.startDate > now }
+        let futureEvents = events.filter { $0.startDate > now }
+        print("📊 Widget: Found \(futureEvents.count) future events")
+
+        let nextEvent = futureEvents
             .sorted { $0.startDate < $1.startDate }
             .first
 
-        guard let event = nextEvent else { return nil }
+        guard let event = nextEvent else {
+            print("⚠️ Widget: No future events to display")
+            return nil
+        }
+
+        print("✅ Widget: Displaying event '\(event.title)' at \(event.startDate)")
 
         return WidgetEvent(
             id: event.id,
