@@ -226,9 +226,10 @@ struct MediumWidgetView: View {
                 VStack(alignment: .center, spacing: 4) {
                     // Show Today/Tomorrow or weekday
                     Text(smartDayText(for: event.startDate))
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.primary)
-                        .minimumScaleFactor(0.8)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
 
                     // Only show day number if NOT today/tomorrow
                     if !isToday(event.startDate) && !isTomorrow(event.startDate) {
@@ -244,7 +245,7 @@ struct MediumWidgetView: View {
                         .foregroundColor(.primary)
                         .minimumScaleFactor(0.8)
                 }
-                .frame(width: 90)
+                .frame(width: 95)
 
                 // Event details - wraps to fill available space
                 VStack(alignment: .leading, spacing: 6) {
