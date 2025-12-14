@@ -221,31 +221,33 @@ struct MediumWidgetView: View {
 
     var body: some View {
         if let event = event {
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 // Large time display
                 VStack(alignment: .center, spacing: 4) {
                     // Show Today/Tomorrow or weekday
                     Text(smartDayText(for: event.startDate))
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: 13, weight: .bold))
                         .foregroundColor(.primary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.5)
 
                     // Only show day number if NOT today/tomorrow
                     if !isToday(event.startDate) && !isTomorrow(event.startDate) {
                         Text(event.startDate.formatted(.dateTime.day()))
-                            .font(.system(size: 40, weight: .bold))
+                            .font(.system(size: 36, weight: .bold))
                             .foregroundColor(.primary)
-                            .minimumScaleFactor(0.8)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     }
 
                     // Larger time display
                     Text(event.startDate, style: .time)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.primary)
-                        .minimumScaleFactor(0.8)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                 }
-                .frame(width: 95)
+                .frame(minWidth: 70, maxWidth: 95)
 
                 // Event details - wraps to fill available space
                 VStack(alignment: .leading, spacing: 6) {
