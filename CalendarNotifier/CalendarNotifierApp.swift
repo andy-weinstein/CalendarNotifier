@@ -1,5 +1,6 @@
 import SwiftUI
 import UserNotifications
+import EventKit
 
 @main
 struct CalendarNotifierApp: App {
@@ -16,9 +17,14 @@ struct CalendarNotifierApp: App {
                 print("\n🟢 APP BECAME ACTIVE")
                 print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
+                // Check/update calendar authorization status
+                EventKitManager.shared.updateAuthorizationStatus()
+
                 // Sync calendar when app becomes active for fresh data
-                Task {
-                    await CalendarSyncManager.shared.syncCalendar()
+                if EventKitManager.shared.isAuthorized {
+                    Task {
+                        await CalendarSyncManager.shared.syncCalendar()
+                    }
                 }
 
                 // Log current state
@@ -75,7 +81,32 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Schedule initial background refresh
         BackgroundTaskManager.shared.scheduleAppRefresh()
 
+        // Observe calendar changes - this works when app is running or suspended
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(calendarDidChange),
+            name: .EKEventStoreChanged,
+            object: EventKitManager.shared.eventStore
+        )
+
         return true
+    }
+
+    // MARK: - Calendar Change Observer
+
+    @objc func calendarDidChange(_ notification: Notification) {
+        print("\n📅 CALENDAR CHANGED (EKEventStoreChanged)")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+        // Sync calendar when local calendar changes
+        // This works when app is running or suspended in background
+        if EventKitManager.shared.isAuthorized {
+            Task {
+                await CalendarSyncManager.shared.syncCalendar()
+            }
+        }
+
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
     }
 
     // MARK: - UNUserNotificationCenterDelegate

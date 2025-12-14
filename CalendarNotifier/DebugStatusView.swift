@@ -4,7 +4,7 @@ import Combine
 
 struct DebugStatusView: View {
     @StateObject private var syncManager = CalendarSyncManager.shared
-    @StateObject private var calendarManager = GoogleCalendarManager.shared
+    @StateObject private var eventKitManager = EventKitManager.shared
     @State private var pendingTasks: [String] = []
     @State private var refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -27,13 +27,20 @@ struct DebugStatusView: View {
                     HStack {
                         Text("Last Sync")
                         Spacer()
-                        if let lastSync = calendarManager.lastSyncDate {
+                        if let lastSync = syncManager.lastSyncDate {
                             Text(lastSync.formatted(.relative(presentation: .named)))
                                 .foregroundColor(.secondary)
                         } else {
                             Text("Never")
                                 .foregroundColor(.secondary)
                         }
+                    }
+
+                    HStack {
+                        Text("Calendar Access")
+                        Spacer()
+                        Text(eventKitManager.isAuthorized ? "Granted" : "Denied")
+                            .foregroundColor(eventKitManager.isAuthorized ? .green : .red)
                     }
 
                     HStack {

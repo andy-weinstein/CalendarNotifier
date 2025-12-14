@@ -81,21 +81,26 @@ class BackgroundTaskManager {
         // Schedule the next refresh immediately
         scheduleAppRefresh()
 
+        // Check if we have calendar access
+        EventKitManager.shared.updateAuthorizationStatus()
+        guard EventKitManager.shared.isAuthorized else {
+            print("⚠️  No calendar access - skipping sync")
+            task.setTaskCompleted(success: false)
+            print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+            return
+        }
+
         // Create a task to perform the sync
         let syncTask = Task {
-            do {
-                // Perform calendar sync
-                await CalendarSyncManager.shared.syncCalendar()
+            // Perform calendar sync - with EventKit this is instant (no network needed)
+            await CalendarSyncManager.shared.syncCalendar()
 
-                print("✅ Background sync completed successfully")
-                task.setTaskCompleted(success: true)
-            } catch {
-                print("❌ Background sync failed: \(error.localizedDescription)")
-                task.setTaskCompleted(success: false)
-            }
+            print("✅ Background sync completed successfully")
+            task.setTaskCompleted(success: true)
         }
 
         // Handle expiration - BGAppRefreshTask gives ~30 seconds
+        // With EventKit, we should never hit this since reads are instant
         task.expirationHandler = {
             print("⚠️  Background task expired - cancelling sync")
             syncTask.cancel()

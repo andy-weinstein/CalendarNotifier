@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var calendarManager = GoogleCalendarManager.shared
+    @StateObject private var eventKitManager = EventKitManager.shared
     @StateObject private var syncManager = CalendarSyncManager.shared
     @StateObject private var soundSettings = SoundSettingsManager.shared
-    @State private var showingAuth = false
+    @State private var showingPermission = false
     @State private var showingSettings = false
     @State private var showingEventList = false
     @State private var currentTime = Date()
@@ -17,16 +17,14 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            if calendarManager.isRestoring {
-                restoringView
-            } else if calendarManager.isAuthenticated {
+            if eventKitManager.isAuthorized {
                 authenticatedView
             } else {
                 unauthenticatedView
             }
         }
-        .sheet(isPresented: $showingAuth) {
-            GoogleAuthView()
+        .sheet(isPresented: $showingPermission) {
+            CalendarPermissionView()
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
@@ -34,22 +32,10 @@ struct ContentView: View {
         .sheet(isPresented: $showingEventList) {
             EventListView()
         }
-    }
-
-    // MARK: - Restoring View
-
-    private var restoringView: some View {
-        VStack(spacing: isBigger ? 24 : 16) {
-            ProgressView()
-                .scaleEffect(isBigger ? 2.0 : 1.5)
-
-            Text("Connecting...")
-                .font(isBigger ? .title2 : .headline)
-                .foregroundColor(.secondary)
+        .onAppear {
+            // Check authorization status on appear
+            eventKitManager.updateAuthorizationStatus()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .navigationTitle("Calendar Notifier")
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Authenticated View
@@ -72,7 +58,7 @@ struct ContentView: View {
                             .font(isBigger ? .body : .caption)
                             .foregroundColor(.secondary)
                     }
-                } else if let lastSync = calendarManager.lastSyncDate {
+                } else if let lastSync = syncManager.lastSyncDate {
                     Text("Last synced \(lastSync.formatted(.relative(presentation: .named)))")
                         .font(isBigger ? .caption : .caption2)
                         .foregroundColor(.secondary)
@@ -237,22 +223,22 @@ struct ContentView: View {
                 .font(isBigger ? .largeTitle : .title)
                 .bold()
 
-            Text("Get notifications 1 hour and 15 minutes before your events")
+            Text("Get notifications before your calendar events")
                 .font(isBigger ? .body : .subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
 
             Button {
-                showingAuth = true
+                showingPermission = true
             } label: {
-                Text("Connect Google Calendar")
+                Text("Allow Calendar Access")
                     .font(isBigger ? .title3 : .body)
                     .padding(.vertical, isBigger ? 8 : 0)
             }
             .buttonStyle(.borderedProminent)
             .padding(.top)
-            .accessibilityHint("Opens Google sign-in")
+            .accessibilityHint("Opens calendar permission request")
         }
         .padding()
         .navigationTitle("Calendar Notifier")

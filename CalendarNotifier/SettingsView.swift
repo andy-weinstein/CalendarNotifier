@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var calendarManager = GoogleCalendarManager.shared
+    @StateObject private var eventKitManager = EventKitManager.shared
     @StateObject private var syncManager = CalendarSyncManager.shared
     @StateObject private var soundSettings = SoundSettingsManager.shared
     @State private var showingSoundSettings = false
@@ -46,7 +46,7 @@ struct SettingsView: View {
                     Text("Calendar Sync")
                         .font(isBigger ? .subheadline : .footnote)
                 } footer: {
-                    Text("Manually sync your Google Calendar events")
+                    Text("Manually sync your calendar events")
                         .font(isBigger ? .subheadline : .footnote)
                 }
 
@@ -158,22 +158,28 @@ struct SettingsView: View {
                         .font(isBigger ? .subheadline : .footnote)
                 }
 
-                // Account Section
+                // Calendar Access Section
                 Section {
                     HStack {
-                        Image(systemName: "person.circle")
+                        Image(systemName: "calendar")
                             .foregroundColor(.blue)
                             .frame(width: isBigger ? 28 : 24)
                             .font(isBigger ? .title3 : .body)
-                        Text("Connected to Google Calendar")
+                        Text("Calendar Access")
                             .font(isBigger ? .body : .body)
                         Spacer()
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .font(isBigger ? .title3 : .body)
+                        if eventKitManager.isAuthorized {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                                .font(isBigger ? .title3 : .body)
+                        } else {
+                            Image(systemName: "exclamationmark.circle.fill")
+                                .foregroundColor(.orange)
+                                .font(isBigger ? .title3 : .body)
+                        }
                     }
 
-                    if let lastSync = calendarManager.lastSyncDate {
+                    if let lastSync = syncManager.lastSyncDate {
                         HStack {
                             Image(systemName: "clock")
                                 .foregroundColor(.blue)
@@ -188,20 +194,26 @@ struct SettingsView: View {
                         }
                     }
 
-                    Button(role: .destructive) {
-                        calendarManager.signOut()
-                        dismiss()
-                    } label: {
-                        HStack {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .frame(width: isBigger ? 28 : 24)
-                                .font(isBigger ? .title3 : .body)
-                            Text("Sign Out")
-                                .font(isBigger ? .body : .body)
+                    if !eventKitManager.isAuthorized {
+                        Button {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "gear")
+                                    .frame(width: isBigger ? 28 : 24)
+                                    .font(isBigger ? .title3 : .body)
+                                Text("Open Settings")
+                                    .font(isBigger ? .body : .body)
+                            }
                         }
                     }
                 } header: {
-                    Text("Account")
+                    Text("Calendar")
+                        .font(isBigger ? .subheadline : .footnote)
+                } footer: {
+                    Text("Reads events from all calendars on your device")
                         .font(isBigger ? .subheadline : .footnote)
                 }
 

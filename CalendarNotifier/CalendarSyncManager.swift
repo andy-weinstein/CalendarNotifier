@@ -8,15 +8,18 @@ class CalendarSyncManager: ObservableObject {
 
     @Published var events: [CalendarEvent] = []
     @Published var lastSyncCount: Int?
+    @Published var lastSyncDate: Date?
     @Published var isSyncing = false
 
     private let userDefaults = UserDefaults.standard
     private let sharedDefaults = UserDefaults(suiteName: "group.com.calendarnotifier.shared")
     private let syncedEventsKey = "syncedEvents"
+    private let lastSyncDateKey = "lastSyncDate"
 
     private init() {
         // Load cached events on init
         events = loadSyncedEvents()
+        lastSyncDate = userDefaults.object(forKey: lastSyncDateKey) as? Date
     }
 
     var nextEvent: CalendarEvent? {
@@ -32,15 +35,14 @@ class CalendarSyncManager: ObservableObject {
             isSyncing = true
         }
 
-        await withCheckedContinuation { continuation in
-            GoogleCalendarManager.shared.fetchEvents { [weak self] events in
-                self?.processEvents(events)
-                continuation.resume()
-            }
-        }
+        // Use EventKit to fetch events from local calendar
+        let fetchedEvents = await EventKitManager.shared.fetchEvents()
+        processEvents(fetchedEvents)
 
         await MainActor.run {
             isSyncing = false
+            lastSyncDate = Date()
+            userDefaults.set(lastSyncDate, forKey: lastSyncDateKey)
         }
     }
     
