@@ -63,8 +63,8 @@ class BackgroundTaskManager {
                     print("   Reason: Too many pending requests")
                 case .notPermitted:
                     print("   Reason: Not permitted - check Info.plist")
-                @unknown default:
-                    print("   Reason: Unknown error")
+                default:
+                    print("   Reason: Unknown error code")
                 }
             }
         }
