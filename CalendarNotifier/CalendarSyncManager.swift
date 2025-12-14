@@ -173,3 +173,13 @@ class CalendarSyncManager: ObservableObject {
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
     }
 }
+
+// MARK: - Calendar Event Model
+
+struct CalendarEvent: Identifiable, Codable {
+    let id: String
+    let title: String
+    let startDate: Date
+    let location: String?
+    let eventDescription: String?
+}
