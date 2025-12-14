@@ -20,7 +20,7 @@ class EventKitManager: ObservableObject {
         let status = EKEventStore.authorizationStatus(for: .event)
         DispatchQueue.main.async {
             self.authorizationStatus = status
-            self.isAuthorized = (status == .fullAccess || status == .authorized)
+            self.isAuthorized = (status == .fullAccess)
         }
     }
 

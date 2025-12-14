@@ -81,7 +81,6 @@ class CalendarSyncManager: ObservableObject {
 
         // Sort events by start date and take the nearest ones for notification scheduling
         let sortedEvents = futureEvents.sorted { $0.startDate < $1.startDate }
-        let eventsForNotifications = Array(sortedEvents.prefix(maxEventsForNotifications))
         let eventsToSkipNotifications = Set(sortedEvents.dropFirst(maxEventsForNotifications).map { $0.id })
 
         if sortedEvents.count > maxEventsForNotifications {
