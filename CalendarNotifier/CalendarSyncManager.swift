@@ -54,7 +54,7 @@ class CalendarSyncManager: ObservableObject {
         let now = Date()
         let futureEvents = newEvents.filter { $0.startDate > now }
 
-        print("📊 Total events from Google: \(newEvents.count)")
+        print("📊 Total events from calendar: \(newEvents.count)")
         print("📊 Future events: \(futureEvents.count)")
 
         // Get previously synced events
